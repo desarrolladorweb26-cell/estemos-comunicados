@@ -421,6 +421,40 @@
       </div>
     </div>
 
+    <!-- MODAL: Compartir publicación -->
+    <div id="modal-share" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t dark:border-zinc-800">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-gray-900 dark:text-white text-base">Compartir publicación</h3>
+          <button id="close-share-modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <p id="share-preview-text" class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 bg-gray-50 dark:bg-zinc-800/70 rounded-xl px-3 py-2"></p>
+
+        <div class="space-y-2.5">
+          <button id="btn-share-whatsapp"
+                  class="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-sm active:scale-95 transition">
+            <i class="ph-fill ph-whatsapp-logo text-xl"></i>
+            <span>Enviar por WhatsApp</span>
+          </button>
+
+          <button id="btn-share-copy"
+                  class="w-full flex items-center justify-center gap-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white font-semibold py-2.5 px-4 rounded-xl text-sm active:scale-95 transition">
+            <i class="ph ph-copy text-xl"></i>
+            <span>Copiar enlace</span>
+          </button>
+
+          <button id="btn-share-native"
+                  class="hidden w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-sm active:scale-95 transition">
+            <i class="ph ph-share-network text-xl"></i>
+            <span>Más opciones</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL: Confirmar borrado -->
     <div id="modal-delete" class="hidden absolute inset-0 bg-black/55 z-50 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 w-full max-w-xs text-center space-y-4 shadow-2xl border dark:border-zinc-800">
@@ -529,6 +563,97 @@
     const modalStoryUpload = document.getElementById("modal-story-upload");
     const modalComments = document.getElementById("modal-comments");
     const modalDelete = document.getElementById("modal-delete");
+    const modalShare = document.getElementById("modal-share");
+    let activeShareData = null;
+
+    function copyTextFallback(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(() => legacyCopy(text));
+      }
+      return legacyCopy(text);
+    }
+
+    function legacyCopy(text) {
+      return new Promise((resolve, reject) => {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function openShareModal(post, authorName) {
+      const shareUrl = window.location.href;
+      const caption = (post.caption || "").trim();
+      const message = caption
+        ? `Mirá esta publicación de ${authorName} en Estemos Comunicados: "${caption}"`
+        : `Mirá esta publicación de ${authorName} en Estemos Comunicados`;
+
+      activeShareData = { title: "Estemos Comunicados", text: message, url: shareUrl };
+      document.getElementById("share-preview-text").textContent = message;
+
+      const nativeBtn = document.getElementById("btn-share-native");
+      if (navigator.share) {
+        nativeBtn.classList.remove("hidden");
+        nativeBtn.classList.add("flex");
+      } else {
+        nativeBtn.classList.add("hidden");
+        nativeBtn.classList.remove("flex");
+      }
+
+      modalShare.classList.remove("hidden");
+    }
+
+    function closeShareModal() {
+      modalShare.classList.add("hidden");
+    }
+
+    document.getElementById("close-share-modal").addEventListener("click", closeShareModal);
+    modalShare.addEventListener("click", (e) => {
+      if (e.target === modalShare) closeShareModal();
+    });
+
+    document.getElementById("btn-share-whatsapp").addEventListener("click", () => {
+      if (!activeShareData) return;
+      const waText = encodeURIComponent(`${activeShareData.text}
+${activeShareData.url}`);
+      window.open(`https://wa.me/?text=${waText}`, "_blank", "noopener,noreferrer");
+      closeShareModal();
+    });
+
+    document.getElementById("btn-share-copy").addEventListener("click", async () => {
+      if (!activeShareData) return;
+      try {
+        await copyTextFallback(activeShareData.url);
+        showToast("¡Enlace copiado al portapapeles!");
+      } catch {
+        showToast("No se pudo copiar el enlace");
+      }
+      closeShareModal();
+    });
+
+    document.getElementById("btn-share-native").addEventListener("click", async () => {
+      if (!activeShareData) return;
+      try {
+        await navigator.share(activeShareData);
+        closeShareModal();
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+        await copyTextFallback(activeShareData.url).catch(() => {});
+        showToast("Enlace copiado al portapapeles");
+        closeShareModal();
+      }
+    });
     const storyViewer = document.getElementById("story-viewer");
     const toastEl = document.getElementById("toast");
 
@@ -1445,19 +1570,8 @@
         });
 
         article.querySelector(".save-btn").addEventListener("click", () => toggleSave(post.id));
-        article.querySelector(".share-btn").addEventListener("click", async () => {
-          if (navigator.share) {
-            try {
-              await navigator.share({
-                title: "Estemos Comunicados",
-                text: post.caption || "Mirá esta publicación en Estemos Comunicados",
-                url: window.location.href
-              });
-            } catch {}
-          } else {
-            navigator.clipboard?.writeText(window.location.href);
-            showToast("Enlace copiado");
-          }
+        article.querySelector(".share-btn").addEventListener("click", () => {
+          openShareModal(post, info.name);
         });
 
         const delBtn = article.querySelector(".delete-btn");
