@@ -1,1426 +1,987 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estemos Comunicados</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Estemos Comunicados</title>
 
-    <!-- Tailwind CSS vía CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PWA Config -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Comunicados" />
+  <link rel="icon" type="image/png" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
 
-    <!-- Configuración de Tailwind para fuente Inter -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: 'Grand Hotel' para el logo e 'Inter' para la interfaz -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Phosphor Icons vía CDN -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <style>
-        /* Tipografía cursiva para el logo */
-        .brand-logo {
-            font-family: 'Grand Hotel', cursive;
-            line-height: 1.1;
-        }
-
-        /* Ocultar barras de desplazamiento manteniendo scroll fluido */
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Animación de rebote para íconos de acción */
-        .pop-animation {
-            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.28); }
-            100% { transform: scale(1); }
-        }
-
-        /* Animación de corazón grande en doble toque/clic sobre la foto */
-        .big-heart-pop {
-            animation: bigHeart 0.85s ease-out forwards;
-        }
-
-        @keyframes bigHeart {
-            0% { transform: scale(0.35); opacity: 0; }
-            25% { transform: scale(1.15); opacity: 0.95; }
-            55% { transform: scale(0.95); opacity: 0.95; }
-            100% { transform: scale(1.25); opacity: 0; }
-        }
-    </style>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-logo {
+      font-family: 'Grand Hotel', cursive;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes heartPop {
+      0% { transform: scale(0); opacity: 0; }
+      35% { transform: scale(1.25); opacity: 0.95; }
+      70% { transform: scale(1); opacity: 0.95; }
+      100% { transform: scale(1.1); opacity: 0; }
+    }
+    .animate-heart-pop {
+      animation: heartPop 0.8s ease-out forwards;
+    }
+    @keyframes btnBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.28); }
+    }
+    .animate-btn-bounce {
+      animation: btnBounce 0.25s ease-in-out;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 md:bg-gray-200 flex items-center justify-center min-h-screen text-gray-900 font-sans selection:bg-rose-100">
+<body class="bg-gray-100 md:py-6 flex justify-center min-h-[100dvh]">
 
-    <!-- Contenedor Híbrido Mobile-First (100dvh en móvil, estilo teléfono centrado en escritorio) -->
-    <main class="w-full md:max-w-md bg-white h-[100dvh] md:h-[90vh] md:max-h-[860px] md:rounded-[2.25rem] md:shadow-2xl flex flex-col overflow-hidden relative md:border md:border-gray-300">
+  <!-- App Container -->
+  <div class="w-full max-w-md bg-white h-[100dvh] md:h-[90dvh] md:rounded-3xl md:shadow-2xl md:border md:border-gray-200 flex flex-col overflow-hidden relative">
 
-        <!-- 1. Cabecera Superior Fija -->
-        <header class="flex-none flex justify-between items-center px-4 py-2.5 border-b border-gray-100 bg-white/95 backdrop-blur-md z-20 gap-2">
-            <!-- Logo responsivo -->
-            <h1 id="brand-logo-btn" class="brand-logo text-[1.7rem] sm:text-[1.95rem] tracking-wide text-gray-900 cursor-pointer whitespace-nowrap truncate pt-0.5 select-none">
-                Estemos Comunicados
-            </h1>
+    <!-- Header -->
+    <header class="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between shrink-0 z-20">
+      <button id="logo-home-btn" class="font-logo text-[28px] sm:text-[32px] leading-none text-gray-900 tracking-wide select-none">
+        Estemos Comunicados
+      </button>
 
-            <!-- Acciones derechas: Notificaciones, Mensajes y Acceso/Perfil rápido -->
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <button type="button" id="btn-notifications" aria-label="Notificaciones" class="relative p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition">
-                    <i class="ph ph-heart text-[24px] text-gray-900"></i>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-                </button>
+      <div class="flex items-center gap-2.5">
+        <!-- Botón Instalar PWA (se muestra solo si es instalable) -->
+        <button id="btn-install-pwa"
+                class="hidden items-center gap-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
+          <i class="ph ph-download-simple text-sm"></i>
+          <span>Instalar</span>
+        </button>
 
-                <button type="button" id="btn-messages" aria-label="Mensajes" class="relative p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition">
-                    <i class="ph ph-messenger-logo text-[24px] text-gray-900"></i>
-                    <span class="absolute top-0.5 right-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center ring-2 ring-white">3</span>
-                </button>
+        <button id="btn-open-auth-header" class="text-gray-800 hover:text-black active:scale-90 transition relative" title="Cuenta">
+          <i class="ph ph-user-circle text-2xl"></i>
+          <span id="auth-status-dot" class="hidden w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full absolute -top-0.5 -right-0.5"></span>
+        </button>
+      </div>
+    </header>
 
-                <!-- Botón rápido de Login / Inicial del usuario -->
-                <button type="button" id="btn-header-profile" aria-label="Cuenta" class="p-1 rounded-full hover:bg-gray-100 active:scale-95 transition flex items-center justify-center">
-                    <span id="header-avatar-badge" class="w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-semibold flex items-center justify-center">
-                        <i class="ph ph-user text-sm"></i>
-                    </span>
-                </button>
-            </div>
-        </header>
+    <!-- Barra de búsqueda (visible cuando se activa pestaña Buscar) -->
+    <div id="search-bar-wrap" class="hidden px-4 py-2.5 bg-white border-b border-gray-100 shrink-0">
+      <div class="relative">
+        <i class="ph ph-magnifying-glass text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-lg"></i>
+        <input id="search-input" type="text" placeholder="Buscar por usuario, lugar o texto..."
+               class="w-full bg-gray-100 rounded-xl pl-9 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+        <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+          <i class="ph-fill ph-x-circle text-lg"></i>
+        </button>
+      </div>
+    </div>
 
-        <!-- Barra de búsqueda plegable (se activa desde el botón Buscar inferior) -->
-        <div id="search-bar-container" class="hidden flex-none px-4 py-2.5 bg-gray-50 border-b border-gray-100 z-10">
-            <div class="relative flex items-center">
-                <i class="ph ph-magnifying-glass text-gray-400 text-lg absolute left-3"></i>
-                <input id="search-input" type="text" placeholder="Buscar por autor, texto o lugar..." class="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                <button type="button" id="btn-clear-search" aria-label="Limpiar búsqueda" class="hidden absolute right-2.5 text-gray-400 hover:text-gray-700 p-1">
-                    <i class="ph-bold ph-x text-sm"></i>
-                </button>
-            </div>
+    <!-- Main Scrollable Content -->
+    <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar bg-white">
+
+      <!-- Vista Feed / Inicio -->
+      <div id="view-feed">
+        <!-- Stories -->
+        <section id="stories-section" class="border-b border-gray-100 py-3 px-3">
+          <div class="flex gap-3.5 overflow-x-auto no-scrollbar" id="stories-container">
+            <!-- Se llena por JS -->
+          </div>
+        </section>
+
+        <!-- Banner invitación a registrarse (se oculta si está logueado) -->
+        <div id="guest-banner" class="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 flex items-center justify-between gap-2">
+          <div class="text-xs text-gray-700">
+            <p class="font-semibold text-gray-900">¡Sumate a la comunidad!</p>
+            <p>Creá tu cuenta para publicar fotos y dar Me gusta.</p>
+          </div>
+          <button id="btn-banner-login" class="shrink-0 bg-gray-900 text-white text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition">
+            Ingresar
+          </button>
         </div>
 
-        <!-- Área Scrolleable Principal (Historias + Feed) -->
-        <div id="scroll-container" class="flex-1 overflow-y-auto hide-scrollbar bg-white scroll-smooth">
+        <!-- Estado de carga -->
+        <div id="feed-loading" class="py-12 flex flex-col items-center justify-center text-gray-400 gap-2">
+          <i class="ph ph-spinner-gap text-3xl animate-spin text-pink-500"></i>
+          <p class="text-xs font-medium">Cargando publicaciones...</p>
+        </div>
 
-            <!-- 2. Tira Horizontal de Historias -->
-            <section aria-label="Historias" class="border-b border-gray-100 py-3">
-                <div class="flex overflow-x-auto hide-scrollbar gap-3.5 px-4 items-start">
+        <!-- Feed vacío -->
+        <div id="feed-empty" class="hidden py-14 px-6 text-center text-gray-500">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+            <i class="ph ph-camera text-3xl"></i>
+          </div>
+          <p class="font-semibold text-gray-800 text-sm">Todavía no hay publicaciones</p>
+          <p class="text-xs mt-1">Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.</p>
+        </div>
 
-                    <!-- Tu historia (abre modal de Nueva Publicación o Login) -->
-                    <button type="button" id="btn-your-story" class="flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="relative">
-                            <div id="your-story-avatar" class="w-16 h-16 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 text-white flex items-center justify-center font-bold text-lg border border-gray-200 group-active:scale-95 transition">
-                                <i class="ph ph-user text-2xl"></i>
-                            </div>
-                            <div class="absolute bottom-0 right-0 bg-blue-500 rounded-full border-2 border-white w-5 h-5 flex items-center justify-center shadow-sm">
-                                <i class="ph-bold ph-plus text-white text-[10px]"></i>
-                            </div>
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center text-gray-600 font-medium">Tu historia</span>
-                    </button>
+        <!-- Lista de publicaciones -->
+        <section id="feed-container" class="divide-y divide-gray-100 pb-6"></section>
+      </div>
 
-                    <!-- Historia: Sofía -->
-                    <button type="button" data-story="Sofía" class="story-item flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="p-[2.5px] bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-full group-active:scale-95 transition">
-                            <img src="https://i.pravatar.cc/150?img=5" alt="Sofía" onerror="this.src='https://placehold.co/150x150/fde68a/92400e?text=SO'" class="w-16 h-16 rounded-full object-cover border-2 border-white bg-white">
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center font-medium text-gray-800">Sofía</span>
-                    </button>
-
-                    <!-- Historia: Martín -->
-                    <button type="button" data-story="Martín" class="story-item flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="p-[2.5px] bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-full group-active:scale-95 transition">
-                            <img src="https://i.pravatar.cc/150?img=12" alt="Martín" onerror="this.src='https://placehold.co/150x150/bfdbfe/1e3a8a?text=MA'" class="w-16 h-16 rounded-full object-cover border-2 border-white bg-white">
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center font-medium text-gray-800">Martín</span>
-                    </button>
-
-                    <!-- Historia: Lucía -->
-                    <button type="button" data-story="Lucía" class="story-item flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="p-[2.5px] bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-full group-active:scale-95 transition">
-                            <img src="https://i.pravatar.cc/150?img=9" alt="Lucía" onerror="this.src='https://placehold.co/150x150/fecdd3/881337?text=LU'" class="w-16 h-16 rounded-full object-cover border-2 border-white bg-white">
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center font-medium text-gray-800">Lucía</span>
-                    </button>
-
-                    <!-- Historia: Mateo -->
-                    <button type="button" data-story="Mateo" class="story-item flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="p-[2.5px] bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-full group-active:scale-95 transition">
-                            <img src="https://i.pravatar.cc/150?img=15" alt="Mateo" onerror="this.src='https://placehold.co/150x150/e5e7eb/374151?text=MT'" class="w-16 h-16 rounded-full object-cover border-2 border-white bg-white">
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center font-medium text-gray-800">Mateo</span>
-                    </button>
-
-                    <!-- Historia: Camila -->
-                    <button type="button" data-story="Camila" class="story-item flex flex-col items-center gap-1.5 min-w-[68px] focus:outline-none group">
-                        <div class="p-[2.5px] bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-full group-active:scale-95 transition">
-                            <img src="https://i.pravatar.cc/150?img=23" alt="Camila" onerror="this.src='https://placehold.co/150x150/ddd6fe/4c1d95?text=CA'" class="w-16 h-16 rounded-full object-cover border-2 border-white bg-white">
-                        </div>
-                        <span class="text-[11px] truncate w-16 text-center font-medium text-gray-800">Camila</span>
-                    </button>
-
-                </div>
-            </section>
-
-            <!-- Banner contextual (modo Guardados o invitación a publicar el primer post real) -->
-            <div id="feed-banner" class="hidden px-4 py-2.5 bg-rose-50/80 border-b border-rose-100 flex items-center justify-between gap-2 text-xs text-rose-900">
-                <span id="feed-banner-text" class="leading-snug"></span>
-                <button type="button" id="feed-banner-action" class="flex-shrink-0 font-semibold text-rose-600 hover:text-rose-800 underline"></button>
+      <!-- Vista Perfil -->
+      <div id="view-profile" class="hidden p-4 pb-8">
+        <div id="profile-logged-out" class="py-10 text-center space-y-4">
+          <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-0.5">
+            <div class="w-full h-full bg-white rounded-full flex items-center justify-center">
+              <i class="ph ph-user text-4xl text-gray-400"></i>
             </div>
-
-            <!-- 3. Feed Principal de Publicaciones (Firestore en tiempo real o Demos) -->
-            <section id="feed-list" aria-label="Publicaciones" class="pb-6 divide-y divide-gray-100">
-                <!-- Estado de carga inicial -->
-                <div class="p-8 text-center text-gray-400 text-sm flex flex-col items-center gap-2">
-                    <i class="ph ph-spinner-gap text-3xl animate-spin text-gray-400"></i>
-                    <span>Cargando publicaciones...</span>
-                </div>
-            </section>
+          </div>
+          <div>
+            <h2 class="font-bold text-gray-900 text-lg">Tu perfil en Estemos Comunicados</h2>
+            <p class="text-xs text-gray-500 mt-1 px-4">Iniciá sesión o creá una cuenta para subir tus fotos y guardar tus publicaciones favoritas.</p>
+          </div>
+          <button id="btn-profile-open-auth" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
+            Iniciar sesión / Registrarse
+          </button>
         </div>
 
-        <!-- Notificación Flotante (Toast) -->
-        <div id="toast" class="pointer-events-none opacity-0 translate-y-2 transition-all duration-300 absolute bottom-16 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg max-w-[90%] text-center z-50">
-            Mensaje
-        </div>
+        <div id="profile-logged-in" class="hidden space-y-5">
+          <div class="flex items-center gap-4">
+            <div id="profile-avatar" class="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase shrink-0">
+              U
+            </div>
+            <div class="flex-1 min-w-0">
+              <h2 id="profile-name" class="font-bold text-gray-900 text-base truncate">Usuario</h2>
+              <p id="profile-email" class="text-xs text-gray-500 truncate">usuario@correo.com</p>
+              <div class="flex gap-4 mt-2 text-xs">
+                <div><span id="stat-posts" class="font-bold text-gray-900">0</span> <span class="text-gray-500">posts</span></div>
+                <div><span id="stat-likes" class="font-bold text-gray-900">0</span> <span class="text-gray-500">likes recibidos</span></div>
+              </div>
+            </div>
+          </div>
 
-        <!-- 4. Barra de Navegación Inferior Fija -->
-        <nav aria-label="Navegación principal" class="flex-none border-t border-gray-200 bg-white px-4 h-14 flex justify-between items-center z-20">
-            <button type="button" id="nav-home" aria-label="Inicio" class="nav-btn p-2.5 text-gray-900 transition active:scale-90">
-                <i class="ph-fill ph-house text-[26px]"></i>
+          <div class="flex gap-2">
+            <button id="btn-profile-new-post" class="flex-1 bg-gray-900 text-white text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
+              + Nueva publicación
             </button>
-
-            <button type="button" id="nav-search" aria-label="Buscar" class="nav-btn p-2.5 text-gray-500 hover:text-gray-900 transition active:scale-90">
-                <i class="ph ph-magnifying-glass text-[26px]"></i>
+            <button id="btn-logout" class="px-4 bg-red-50 text-red-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-red-100 active:scale-95 transition">
+              Cerrar sesión
             </button>
+          </div>
 
-            <!-- Botón destacado para Crear Publicación -->
-            <button type="button" id="nav-create" aria-label="Crear publicación" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-fuchsia-600 text-white shadow-md hover:opacity-95 active:scale-95 transition flex items-center justify-center">
-                <i class="ph-bold ph-plus text-[22px]"></i>
-            </button>
-
-            <button type="button" id="nav-saved" aria-label="Guardados" class="nav-btn p-2.5 text-gray-500 hover:text-gray-900 transition active:scale-90">
-                <i class="ph ph-bookmark-simple text-[26px]"></i>
-            </button>
-
-            <button type="button" id="nav-profile" aria-label="Perfil" class="nav-btn p-2 text-gray-500 hover:text-gray-900 transition active:scale-90 flex items-center justify-center">
-                <span id="nav-profile-badge" class="w-7 h-7 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-700 text-xs font-bold flex items-center justify-center">
-                    <i class="ph ph-user text-sm"></i>
-                </span>
-            </button>
-        </nav>
-
-        <!-- ========================================================= -->
-        <!-- MODAL 1: AUTENTICACIÓN (Iniciar sesión / Crear cuenta)    -->
-        <!-- ========================================================= -->
-        <div id="auth-modal" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="bg-white w-full sm:rounded-3xl rounded-t-3xl p-6 shadow-2xl max-h-[90%] overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="brand-logo text-3xl text-gray-900">Estemos Comunicados</h2>
-                        <p class="text-xs text-gray-500">Conectate con tu comunidad</p>
-                    </div>
-                    <button type="button" data-close-modal="auth-modal" aria-label="Cerrar" class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                <!-- Pestañas Login / Registro -->
-                <div class="grid grid-cols-2 bg-gray-100 p-1 rounded-xl mb-5">
-                    <button type="button" id="tab-login" class="py-2 text-sm font-semibold rounded-lg bg-white text-gray-900 shadow-sm transition">
-                        Iniciar sesión
-                    </button>
-                    <button type="button" id="tab-register" class="py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-800 transition">
-                        Crear cuenta
-                    </button>
-                </div>
-
-                <!-- Mensaje de error de Auth -->
-                <div id="auth-error" class="hidden mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs leading-relaxed"></div>
-
-                <!-- Formulario -->
-                <form id="auth-form" class="space-y-3.5">
-                    <div id="field-name-wrap" class="hidden">
-                        <label for="auth-name" class="block text-xs font-medium text-gray-700 mb-1">Nombre completo</label>
-                        <input id="auth-name" type="text" placeholder="Ej: Lucía Fernández" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                    </div>
-
-                    <div>
-                        <label for="auth-email" class="block text-xs font-medium text-gray-700 mb-1">Correo electrónico</label>
-                        <input id="auth-email" type="email" required placeholder="tu@correo.com" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                    </div>
-
-                    <div>
-                        <label for="auth-password" class="block text-xs font-medium text-gray-700 mb-1">Contraseña</label>
-                        <input id="auth-password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                    </div>
-
-                    <button type="submit" id="auth-submit-btn" class="w-full mt-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 disabled:opacity-60">
-                        <span id="auth-submit-text">Iniciar sesión</span>
-                        <i id="auth-submit-spinner" class="hidden ph ph-spinner-gap animate-spin text-lg"></i>
-                    </button>
-                </form>
-            </div>
+          <div class="border-t border-gray-100 pt-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Mis publicaciones</h3>
+            <div id="profile-posts-grid" class="grid grid-cols-3 gap-1"></div>
+            <p id="profile-no-posts" class="hidden text-center text-xs text-gray-400 py-8">Aún no subiste ninguna foto.</p>
+          </div>
         </div>
-
-        <!-- ========================================================= -->
-        <!-- MODAL 2: PERFIL DEL USUARIO CONECTADO                     -->
-        <!-- ========================================================= -->
-        <div id="profile-modal" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="bg-white w-full sm:rounded-3xl rounded-t-3xl p-6 shadow-2xl">
-                <div class="flex justify-between items-center mb-5">
-                    <h2 class="font-bold text-base text-gray-900">Tu perfil</h2>
-                    <button type="button" data-close-modal="profile-modal" aria-label="Cerrar" class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-4 mb-6">
-                    <div id="profile-avatar-lg" class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 text-white text-2xl font-bold flex items-center justify-center shadow-md flex-shrink-0">
-                        U
-                    </div>
-                    <div class="min-w-0">
-                        <h3 id="profile-name" class="font-bold text-lg text-gray-900 truncate">Usuario</h3>
-                        <p id="profile-email" class="text-xs text-gray-500 truncate">correo@ejemplo.com</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-gray-50 rounded-2xl p-3.5 text-center border border-gray-100">
-                        <p id="profile-posts-count" class="text-xl font-bold text-gray-900">0</p>
-                        <p class="text-xs text-gray-500">Publicaciones</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-2xl p-3.5 text-center border border-gray-100">
-                        <p id="profile-saved-count" class="text-xl font-bold text-gray-900">0</p>
-                        <p class="text-xs text-gray-500">Guardados</p>
-                    </div>
-                </div>
-
-                <div class="space-y-2.5">
-                    <button type="button" id="btn-profile-new-post" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-plus-circle text-lg"></i>
-                        Nueva publicación
-                    </button>
-                    <button type="button" id="btn-logout" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-sign-out text-lg"></i>
-                        Cerrar sesión
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================================= -->
-        <!-- MODAL 3: NUEVA PUBLICACIÓN (Galería con Canvas o URL)     -->
-        <!-- ========================================================= -->
-        <div id="new-post-modal" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="bg-white w-full sm:rounded-3xl rounded-t-3xl p-5 shadow-2xl max-h-[92%] overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-bold text-base text-gray-900">Nueva publicación</h2>
-                    <button type="button" data-close-modal="new-post-modal" aria-label="Cerrar" class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                        <i class="ph-bold ph-x text-lg"></i>
-                    </button>
-                </div>
-
-                <form id="new-post-form" class="space-y-3.5">
-                    <!-- Selector de origen de imagen -->
-                    <div class="grid grid-cols-2 gap-2">
-                        <label for="post-file-input" class="cursor-pointer flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-700 transition text-center">
-                            <i class="ph-bold ph-image text-base text-rose-500"></i>
-                            Subir de galería
-                            <input id="post-file-input" type="file" accept="image/*" class="hidden">
-                        </label>
-                        <button type="button" id="btn-toggle-url-input" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-700 transition">
-                            <i class="ph-bold ph-link text-base text-blue-500"></i>
-                            Pegar URL
-                        </button>
-                    </div>
-
-                    <!-- Campo de URL de imagen -->
-                    <div id="post-url-wrap" class="hidden">
-                        <input id="post-url-input" type="url" placeholder="https://ejemplo.com/mi-foto.jpg" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                    </div>
-
-                    <!-- Vista previa en vivo de la imagen -->
-                    <div id="post-preview-wrap" class="hidden relative w-full aspect-square max-h-64 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
-                        <img id="post-preview-img" src="" alt="Vista previa" class="w-full h-full object-cover">
-                        <button type="button" id="btn-remove-preview" aria-label="Quitar imagen" class="absolute top-2 right-2 bg-black/65 hover:bg-black/80 text-white p-1.5 rounded-full transition">
-                            <i class="ph-bold ph-x text-sm"></i>
-                        </button>
-                        <span id="post-preview-badge" class="absolute bottom-2 left-2 bg-black/65 text-white text-[10px] font-medium px-2.5 py-1 rounded-full">
-                            Imagen lista
-                        </span>
-                    </div>
-
-                    <!-- Ubicación opcional -->
-                    <div>
-                        <label for="post-location" class="block text-xs font-medium text-gray-700 mb-1">Ubicación (opcional)</label>
-                        <div class="relative flex items-center">
-                            <i class="ph ph-map-pin text-gray-400 text-base absolute left-3"></i>
-                            <input id="post-location" type="text" maxlength="60" placeholder="Ej: Rosario, Santa Fe" class="w-full border border-gray-200 rounded-xl pl-9 pr-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20">
-                        </div>
-                    </div>
-
-                    <!-- Descripción / Pie de foto -->
-                    <div>
-                        <label for="post-caption" class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
-                        <textarea id="post-caption" rows="3" maxlength="500" placeholder="¿Qué querés compartir hoy con la comunidad?" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 resize-none"></textarea>
-                    </div>
-
-                    <!-- Botón Publicar con estado de carga -->
-                    <button type="submit" id="btn-publish-submit" class="w-full bg-gradient-to-r from-rose-500 to-fuchsia-600 hover:opacity-95 text-white font-semibold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md disabled:opacity-60">
-                        <span id="publish-btn-text">Publicar</span>
-                        <i id="publish-btn-spinner" class="hidden ph ph-spinner-gap animate-spin text-lg"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ========================================================= -->
-        <!-- MODAL 4: CONFIRMAR ELIMINACIÓN (sin usar confirm())       -->
-        <!-- ========================================================= -->
-        <div id="delete-modal" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-5">
-            <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl text-center">
-                <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-3">
-                    <i class="ph-bold ph-trash text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-base text-gray-900 mb-1">¿Eliminar publicación?</h3>
-                <p class="text-xs text-gray-500 mb-5">Esta acción no se puede deshacer y la publicación desaparecerá del feed.</p>
-                <div class="grid grid-cols-2 gap-2.5">
-                    <button type="button" data-close-modal="delete-modal" class="py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition">
-                        Cancelar
-                    </button>
-                    <button type="button" id="btn-confirm-delete" class="py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition flex items-center justify-center gap-1.5">
-                        <span>Eliminar</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+      </div>
 
     </main>
 
-    <!-- Lógica Principal con Firebase Auth + Firestore (SDK Modular v10.14.1) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            updateProfile,
-            signOut,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            doc,
-            updateDoc,
-            deleteDoc,
-            arrayUnion,
-            arrayRemove,
-            increment,
-            query,
-            orderBy,
-            onSnapshot,
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-100 px-6 py-2.5 flex items-center justify-between shrink-0 z-20">
+      <button data-nav="home" class="nav-btn text-gray-900 p-1 active:scale-90 transition" title="Inicio">
+        <i class="ph-fill ph-house text-2xl"></i>
+      </button>
+      <button data-nav="search" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Buscar">
+        <i class="ph ph-magnifying-glass text-2xl"></i>
+      </button>
+      <button id="btn-nav-create" class="p-1 text-gray-800 hover:text-pink-600 active:scale-90 transition" title="Nueva publicación">
+        <i class="ph ph-plus-square text-[26px]"></i>
+      </button>
+      <button data-nav="saved" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Guardados">
+        <i class="ph ph-bookmark-simple text-2xl"></i>
+      </button>
+      <button data-nav="profile" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Perfil">
+        <i class="ph ph-user-circle text-2xl"></i>
+      </button>
+    </nav>
 
-        // =========================================================
-        // 1. CONFIGURACIÓN DE FIREBASE
-        // =========================================================
-        const firebaseConfig = {
-          apiKey: "AIzaSyCEMOjsjFVi0gcx0e_rHr3uaMkc_kCGSYA",
-          authDomain: "estemos-comunicados.firebaseapp.com",
-          projectId: "estemos-comunicados",
-          storageBucket: "estemos-comunicados.firebasestorage.app",
-          messagingSenderId: "308852092034",
-          appId: "1:308852092034:web:a898b42bc162dc1029189b"
+    <!-- MODAL: Autenticación (Login / Registro) -->
+    <div id="modal-auth" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h3 id="auth-modal-title" class="font-bold text-gray-900 text-lg">Iniciar sesión</h3>
+          <button id="close-auth-modal" class="text-gray-400 hover:text-gray-700 p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Tabs Login / Registro -->
+        <div class="grid grid-cols-2 bg-gray-100 p-1 rounded-xl text-xs font-semibold">
+          <button id="tab-login" class="py-2 rounded-lg bg-white text-gray-900 shadow-xs transition">Iniciar sesión</button>
+          <button id="tab-register" class="py-2 rounded-lg text-gray-500 transition">Crear cuenta</button>
+        </div>
+
+        <form id="auth-form" class="space-y-3">
+          <div id="auth-name-wrap" class="hidden">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Nombre y apellido</label>
+            <input id="auth-name" type="text" placeholder="Ej: Juan Pérez"
+                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Correo electrónico</label>
+            <input id="auth-email" type="email" required placeholder="tu@correo.com"
+                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña</label>
+            <input id="auth-pass" type="password" required minlength="6" placeholder="Mínimo 6 caracteres"
+                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          </div>
+
+          <p id="auth-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+
+          <button id="auth-submit-btn" type="submit"
+                  class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
+            Entrar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: Nueva Publicación -->
+    <div id="modal-post" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-3.5 shadow-2xl max-h-[90dvh] overflow-y-auto">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-gray-900 text-lg">Nueva publicación</h3>
+          <button id="close-post-modal" class="text-gray-400 hover:text-gray-700 p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <form id="post-form" class="space-y-3">
+          <!-- Selector de archivo -->
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Elegí una foto de tu celular o PC</label>
+            <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition bg-gray-50">
+              <input id="post-file" type="file" accept="image/*" class="hidden" />
+              <img id="post-preview" class="hidden w-full max-h-48 object-cover rounded-lg mb-2" alt="Vista previa" />
+              <div id="post-file-placeholder" class="flex flex-col items-center text-gray-400 gap-1">
+                <i class="ph ph-image text-3xl"></i>
+                <span class="text-xs font-medium">Tocá para elegir una imagen</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-2 text-[11px] text-gray-400">
+            <div class="h-px bg-gray-200 flex-1"></div>
+            <span>O pegá un enlace de imagen</span>
+            <div class="h-px bg-gray-200 flex-1"></div>
+          </div>
+
+          <input id="post-url" type="url" placeholder="https://ejemplo.com/foto.jpg"
+                 class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+
+          <input id="post-location" type="text" placeholder="Ubicación (ej: Arroyo Seco, Santa Fe)"
+                 class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+
+          <textarea id="post-caption" rows="2" placeholder="Escribí una descripción..."
+                    class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none"></textarea>
+
+          <p id="post-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+
+          <button id="post-submit-btn" type="submit"
+                  class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
+            Publicar ahora
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: Confirmar borrado -->
+    <div id="modal-delete" class="hidden absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center space-y-4 shadow-2xl">
+        <div class="w-12 h-12 mx-auto rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+          <i class="ph ph-trash text-2xl"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-gray-900">¿Eliminar publicación?</h4>
+          <p class="text-xs text-gray-500 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="btn-cancel-delete" class="flex-1 py-2 rounded-xl bg-gray-100 text-gray-700 text-xs font-semibold">Cancelar</button>
+          <button id="btn-confirm-delete" class="flex-1 py-2 rounded-xl bg-red-600 text-white text-xs font-semibold">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast flotante -->
+    <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 absolute bottom-16 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg z-50 whitespace-nowrap">
+      Aviso
+    </div>
+
+  </div>
+
+  <!-- Firebase + App Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      updateProfile,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      updateDoc,
+      arrayUnion,
+      arrayRemove,
+      query,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCEMOjsjFVi0gcx0e_rHr3uaMkc_kCGSYA",
+      authDomain: "estemos-comunicados.firebaseapp.com",
+      projectId: "estemos-comunicados",
+      storageBucket: "estemos-comunicados.firebasestorage.app",
+      messagingSenderId: "308852092034",
+      appId: "1:308852092034:web:a898b42bc162dc1029189b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Estado global
+    let currentUser = null;
+    let allPosts = [];
+    let currentTab = "home";
+    let authMode = "login"; // 'login' | 'register'
+    let compressedImageDataUrl = "";
+    let pendingDeleteId = null;
+    let savedIds = JSON.parse(localStorage.getItem("ec_saved_posts") || "[]");
+
+    // Referencias DOM
+    const feedContainer = document.getElementById("feed-container");
+    const feedLoading = document.getElementById("feed-loading");
+    const feedEmpty = document.getElementById("feed-empty");
+    const storiesSection = document.getElementById("stories-section");
+    const storiesContainer = document.getElementById("stories-container");
+    const guestBanner = document.getElementById("guest-banner");
+    const authStatusDot = document.getElementById("auth-status-dot");
+
+    const viewFeed = document.getElementById("view-feed");
+    const viewProfile = document.getElementById("view-profile");
+    const searchBarWrap = document.getElementById("search-bar-wrap");
+    const searchInput = document.getElementById("search-input");
+    const clearSearchBtn = document.getElementById("clear-search-btn");
+
+    const modalAuth = document.getElementById("modal-auth");
+    const modalPost = document.getElementById("modal-post");
+    const modalDelete = document.getElementById("modal-delete");
+    const toastEl = document.getElementById("toast");
+
+    let toastTimer = null;
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.remove("opacity-0");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.add("opacity-0"), 2600);
+    }
+
+    function timeAgo(timestamp) {
+      if (!timestamp || !timestamp.toDate) return "Recién";
+      const seconds = Math.floor((Date.now() - timestamp.toDate().getTime()) / 1000);
+      if (seconds < 60) return "Hace un momento";
+      const mins = Math.floor(seconds / 60);
+      if (mins < 60) return `Hace ${mins} min`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `Hace ${hrs} h`;
+      const days = Math.floor(hrs / 24);
+      return `Hace ${days} d`;
+    }
+
+    function translateAuthError(code) {
+      const map = {
+        "auth/email-already-in-use": "Ese correo ya está registrado. Probá iniciar sesión.",
+        "auth/invalid-email": "El correo electrónico no es válido.",
+        "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+        "auth/invalid-credential": "Correo o contraseña incorrectos.",
+        "auth/user-not-found": "No existe una cuenta con ese correo.",
+        "auth/wrong-password": "Contraseña incorrecta.",
+        "auth/too-many-requests": "Demasiados intentos. Esperá un momento y volvé a probar.",
+        "auth/unauthorized-domain": "Falta autorizar este dominio en Firebase Console → Authentication → Settings."
+      };
+      return map[code] || "Ocurrió un error al autenticar. Revisá los datos e intentá nuevamente.";
+    }
+
+    // Stories de ejemplo + usuarios activos
+    function renderStories() {
+      const defaults = [
+        { name: "Tu historia", isOwn: true },
+        { name: "Comunidad" },
+        { name: "Eventos" },
+        { name: "Noticias" },
+        { name: "Deportes" },
+        { name: "Comercios" }
+      ];
+      storiesContainer.innerHTML = "";
+      defaults.forEach((s) => {
+        const div = document.createElement("button");
+        div.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
+        div.innerHTML = `
+          <div class="w-14 h-14 rounded-full p-[2.5px] ${s.isOwn ? "bg-gray-200" : "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"} relative">
+            <div class="w-full h-full rounded-full bg-white p-[2px] flex items-center justify-center">
+              <div class="w-full h-full rounded-full bg-gradient-to-br from-pink-100 to-purple-100 text-pink-700 font-bold text-sm flex items-center justify-center uppercase">
+                ${s.isOwn ? (currentUser ? (currentUser.displayName || currentUser.email)[0] : "+") : s.name[0]}
+              </div>
+            </div>
+            ${s.isOwn ? '<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-blue-500 text-white border-2 border-white flex items-center justify-center text-xs font-bold">+</span>' : ""}
+          </div>
+          <span class="text-[11px] text-gray-700 truncate w-full text-center">${s.name}</span>
+        `;
+        div.addEventListener("click", () => {
+          if (s.isOwn) {
+            openCreatePost();
+          } else {
+            showToast(`Historias de ${s.name}`);
+          }
+        });
+        storiesContainer.appendChild(div);
+      });
+    }
+
+    // Navegación
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        const icon = btn.querySelector("i");
+        const isActive = btn.dataset.nav === tab;
+        btn.classList.toggle("text-gray-900", isActive);
+        btn.classList.toggle("text-gray-500", !isActive);
+        if (isActive) {
+          icon.classList.remove("ph");
+          icon.classList.add("ph-fill");
+        } else {
+          icon.classList.remove("ph-fill");
+          icon.classList.add("ph");
+        }
+      });
+
+      searchBarWrap.classList.toggle("hidden", tab !== "search");
+      viewProfile.classList.toggle("hidden", tab !== "profile");
+      viewFeed.classList.toggle("hidden", tab === "profile");
+      storiesSection.classList.toggle("hidden", tab !== "home");
+
+      if (tab === "search") {
+        searchInput.focus();
+      }
+      if (tab === "profile") {
+        renderProfile();
+      } else {
+        renderFeed();
+      }
+    }
+
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.nav));
+    });
+    document.getElementById("logo-home-btn").addEventListener("click", () => switchTab("home"));
+
+    // Auth modal
+    function setAuthMode(mode) {
+      authMode = mode;
+      const isReg = mode === "register";
+      document.getElementById("auth-modal-title").textContent = isReg ? "Crear cuenta" : "Iniciar sesión";
+      document.getElementById("auth-submit-btn").textContent = isReg ? "Registrarme" : "Entrar";
+      document.getElementById("auth-name-wrap").classList.toggle("hidden", !isReg);
+      document.getElementById("auth-error").classList.add("hidden");
+
+      const tabLogin = document.getElementById("tab-login");
+      const tabReg = document.getElementById("tab-register");
+      tabLogin.className = `py-2 rounded-lg transition ${!isReg ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"}`;
+      tabReg.className = `py-2 rounded-lg transition ${isReg ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"}`;
+    }
+
+    function openAuthModal(mode = "login") {
+      setAuthMode(mode);
+      modalAuth.classList.remove("hidden");
+    }
+
+    document.getElementById("tab-login").addEventListener("click", () => setAuthMode("login"));
+    document.getElementById("tab-register").addEventListener("click", () => setAuthMode("register"));
+    document.getElementById("close-auth-modal").addEventListener("click", () => modalAuth.classList.add("hidden"));
+    document.getElementById("btn-banner-login").addEventListener("click", () => openAuthModal("register"));
+    document.getElementById("btn-profile-open-auth").addEventListener("click", () => openAuthModal("login"));
+    document.getElementById("btn-open-auth-header").addEventListener("click", () => {
+      if (currentUser) switchTab("profile");
+      else openAuthModal("login");
+    });
+
+    document.getElementById("auth-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("auth-name").value.trim();
+      const email = document.getElementById("auth-email").value.trim();
+      const pass = document.getElementById("auth-pass").value;
+      const errEl = document.getElementById("auth-error");
+      const submitBtn = document.getElementById("auth-submit-btn");
+
+      errEl.classList.add("hidden");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Procesando...";
+
+      try {
+        if (authMode === "register") {
+          const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          if (name) {
+            await updateProfile(cred.user, { displayName: name });
+          }
+          showToast("¡Cuenta creada con éxito!");
+        } else {
+          await signInWithEmailAndPassword(auth, email, pass);
+          showToast("¡Bienvenido de nuevo!");
+        }
+        modalAuth.classList.add("hidden");
+        document.getElementById("auth-form").reset();
+      } catch (err) {
+        errEl.textContent = translateAuthError(err.code);
+        errEl.classList.remove("hidden");
+      } finally {
+        submitBtn.disabled = false;
+        setAuthMode(authMode);
+      }
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      await signOut(auth);
+      showToast("Sesión cerrada");
+      switchTab("home");
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      guestBanner.classList.toggle("hidden", !!user);
+      authStatusDot.classList.toggle("hidden", !user);
+      renderStories();
+      renderFeed();
+      if (currentTab === "profile") renderProfile();
+    });
+
+    // Compresión de imagen en el navegador para Firestore
+    function compressImage(file, maxWidth = 900, quality = 0.72) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function openCreatePost() {
+      if (!currentUser) {
+        showToast("Iniciá sesión para publicar");
+        openAuthModal("login");
+        return;
+      }
+      modalPost.classList.remove("hidden");
+    }
+
+    document.getElementById("btn-nav-create").addEventListener("click", openCreatePost);
+    document.getElementById("btn-profile-new-post").addEventListener("click", openCreatePost);
+    document.getElementById("close-post-modal").addEventListener("click", () => modalPost.classList.add("hidden"));
+
+    const postFileInput = document.getElementById("post-file");
+    const postPreview = document.getElementById("post-preview");
+    const postFilePlaceholder = document.getElementById("post-file-placeholder");
+
+    postFileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        compressedImageDataUrl = await compressImage(file);
+        postPreview.src = compressedImageDataUrl;
+        postPreview.classList.remove("hidden");
+        postFilePlaceholder.classList.add("hidden");
+      } catch {
+        showToast("No se pudo leer la imagen");
+      }
+    });
+
+    document.getElementById("post-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return openAuthModal("login");
+
+      const urlVal = document.getElementById("post-url").value.trim();
+      const locationVal = document.getElementById("post-location").value.trim();
+      const captionVal = document.getElementById("post-caption").value.trim();
+      const imageFinal = compressedImageDataUrl || urlVal;
+      const errEl = document.getElementById("post-error");
+      const submitBtn = document.getElementById("post-submit-btn");
+
+      if (!imageFinal) {
+        errEl.textContent = "Elegí una foto de tu galería o pegá un enlace de imagen.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      errEl.classList.add("hidden");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Publicando...";
+
+      try {
+        await addDoc(collection(db, "posts"), {
+          uid: currentUser.uid,
+          author: currentUser.displayName || currentUser.email.split("@")[0],
+          imageUrl: imageFinal,
+          location: locationVal,
+          caption: captionVal,
+          likedBy: [],
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("post-form").reset();
+        compressedImageDataUrl = "";
+        postPreview.classList.add("hidden");
+        postFilePlaceholder.classList.remove("hidden");
+        modalPost.classList.add("hidden");
+        showToast("¡Publicado con éxito!");
+        switchTab("home");
+      } catch (err) {
+        errEl.textContent = "Error al publicar. Revisá las reglas de Firestore.";
+        errEl.classList.remove("hidden");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Publicar ahora";
+      }
+    });
+
+    // Likes en tiempo real
+    async function toggleLike(post) {
+      if (!currentUser) {
+        showToast("Iniciá sesión para dar Me gusta");
+        openAuthModal("login");
+        return;
+      }
+      const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
+      const alreadyLiked = likedBy.includes(currentUser.uid);
+      const ref = doc(db, "posts", post.id);
+      try {
+        await updateDoc(ref, {
+          likedBy: alreadyLiked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
+        });
+      } catch {
+        showToast("No se pudo actualizar el Me gusta");
+      }
+    }
+
+    function toggleSave(postId) {
+      if (savedIds.includes(postId)) {
+        savedIds = savedIds.filter((id) => id !== postId);
+        showToast("Quitado de guardados");
+      } else {
+        savedIds.push(postId);
+        showToast("Guardado en favoritos");
+      }
+      localStorage.setItem("ec_saved_posts", JSON.stringify(savedIds));
+      renderFeed();
+    }
+
+    // Borrar publicación propia
+    document.getElementById("btn-cancel-delete").addEventListener("click", () => {
+      pendingDeleteId = null;
+      modalDelete.classList.add("hidden");
+    });
+    document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
+      if (!pendingDeleteId) return;
+      try {
+        await deleteDoc(doc(db, "posts", pendingDeleteId));
+        showToast("Publicación eliminada");
+      } catch {
+        showToast("No se pudo eliminar la publicación");
+      } finally {
+        pendingDeleteId = null;
+        modalDelete.classList.add("hidden");
+      }
+    });
+
+    // Búsqueda
+    searchInput.addEventListener("input", () => {
+      clearSearchBtn.classList.toggle("hidden", !searchInput.value);
+      renderFeed();
+    });
+    clearSearchBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      clearSearchBtn.classList.add("hidden");
+      renderFeed();
+    });
+
+    // Renderizar Feed
+    function renderFeed() {
+      let list = [...allPosts];
+
+      if (currentTab === "saved") {
+        list = list.filter((p) => savedIds.includes(p.id));
+      } else if (currentTab === "search" && searchInput.value.trim()) {
+        const q = searchInput.value.trim().toLowerCase();
+        list = list.filter((p) =>
+          (p.author || "").toLowerCase().includes(q) ||
+          (p.location || "").toLowerCase().includes(q) ||
+          (p.caption || "").toLowerCase().includes(q)
+        );
+      }
+
+      feedContainer.innerHTML = "";
+      feedEmpty.classList.toggle("hidden", list.length > 0);
+
+      list.forEach((post) => {
+        const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
+        const isLiked = currentUser && likedBy.includes(currentUser.uid);
+        const isSaved = savedIds.includes(post.id);
+        const isOwner = currentUser && currentUser.uid === post.uid;
+
+        const article = document.createElement("article");
+        article.className = "bg-white pb-4";
+
+        article.innerHTML = `
+          <div class="flex items-center justify-between px-3 py-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                ${(post.author || "U")[0]}
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-sm text-gray-900 leading-tight truncate author-name"></p>
+                <p class="text-[11px] text-gray-500 truncate post-loc"></p>
+              </div>
+            </div>
+            ${isOwner ? '<button class="delete-btn text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-lg"></i></button>' : ""}
+          </div>
+
+          <div class="relative bg-gray-100 select-none overflow-hidden img-wrap">
+            <img class="w-full max-h-[460px] object-cover post-img" alt="Publicación" loading="lazy" />
+            <div class="heart-overlay pointer-events-none absolute inset-0 flex items-center justify-center opacity-0">
+              <i class="ph-fill ph-heart text-white text-7xl drop-shadow-lg"></i>
+            </div>
+          </div>
+
+          <div class="px-3 pt-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <button class="like-btn active:scale-90 transition ${isLiked ? "text-red-500" : "text-gray-800"}">
+                <i class="${isLiked ? "ph-fill" : "ph"} ph-heart text-2xl"></i>
+              </button>
+              <button class="share-btn text-gray-800 active:scale-90 transition">
+                <i class="ph ph-paper-plane-tilt text-2xl"></i>
+              </button>
+            </div>
+            <button class="save-btn active:scale-90 transition ${isSaved ? "text-gray-900" : "text-gray-700"}">
+              <i class="${isSaved ? "ph-fill" : "ph"} ph-bookmark-simple text-2xl"></i>
+            </button>
+          </div>
+
+          <div class="px-3 pt-1.5 space-y-1">
+            <p class="text-xs font-semibold text-gray-900">${likedBy.length} ${likedBy.length === 1 ? "Me gusta" : "Me gusta"}</p>
+            <p class="text-sm text-gray-800 leading-snug">
+              <span class="font-semibold mr-1 author-cap"></span>
+              <span class="post-cap"></span>
+            </p>
+            <p class="text-[10px] uppercase tracking-wide text-gray-400">${timeAgo(post.createdAt)}</p>
+          </div>
+        `;
+
+        // Contenido seguro (anti-XSS)
+        article.querySelector(".author-name").textContent = post.author || "Usuario";
+        const locEl = article.querySelector(".post-loc");
+        if (post.location) locEl.textContent = post.location;
+        else locEl.classList.add("hidden");
+
+        article.querySelector(".author-cap").textContent = post.author || "Usuario";
+        article.querySelector(".post-cap").textContent = post.caption || "";
+
+        const imgEl = article.querySelector(".post-img");
+        imgEl.src = post.imageUrl;
+        imgEl.onerror = () => {
+          imgEl.src = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80";
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Eventos
+        const likeBtn = article.querySelector(".like-btn");
+        likeBtn.addEventListener("click", () => {
+          likeBtn.classList.add("animate-btn-bounce");
+          toggleLike(post);
+        });
 
-        // =========================================================
-        // 2. ESTADO DE LA APLICACIÓN
-        // =========================================================
-        let currentUser = null;
-        let authMode = "login"; // "login" | "register"
-        let firestorePosts = [];
-        let hasLoadedFirestore = false;
-        let activeFilter = "all"; // "all" | "saved"
-        let searchQuery = "";
-        let compressedBase64Image = "";
-        let postIdToDelete = null;
-        let toastTimer = null;
-        const lastTapMap = {};
+        // Doble toque en la foto
+        let lastTap = 0;
+        const imgWrap = article.querySelector(".img-wrap");
+        const heartOverlay = article.querySelector(".heart-overlay");
+        imgWrap.addEventListener("click", () => {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            heartOverlay.classList.remove("animate-heart-pop");
+            void heartOverlay.offsetWidth;
+            heartOverlay.classList.add("animate-heart-pop");
+            if (!isLiked) toggleLike(post);
+          }
+          lastTap = now;
+        });
 
-        // Publicaciones de demostración (se muestran solo cuando Firestore tiene 0 posts)
-        const demoPosts = [
-            {
-                id: "demo-1",
-                isDemo: true,
-                uid: "demo-user-1",
-                author: "Sofía Morales",
-                location: "Bariloche, Argentina",
-                imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
-                caption: "Arrancando el día frente al lago y las montañas. ¡Bienvenidos a Estemos Comunicados! 🏔️✨",
-                likes: 128,
-                likedLocally: false,
-                createdAtMs: Date.now() - 1000 * 60 * 45
-            },
-            {
-                id: "demo-2",
-                isDemo: true,
-                uid: "demo-user-2",
-                author: "Martín Gómez",
-                location: "Rosario, Santa Fe",
-                imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop&q=80",
-                caption: "Café recién hecho y buena charla para cortar la tarde ☕🥐 ¿Desde dónde nos leen hoy?",
-                likes: 84,
-                likedLocally: false,
-                createdAtMs: Date.now() - 1000 * 60 * 180
-            }
-        ];
-
-        // Guardados persistidos en localStorage
-        const SAVED_STORAGE_KEY = "estemos_comunicados_saved_v1";
-        let savedPostIds = cargarGuardados();
-
-        function cargarGuardados() {
+        article.querySelector(".save-btn").addEventListener("click", () => toggleSave(post.id));
+        article.querySelector(".share-btn").addEventListener("click", async () => {
+          if (navigator.share) {
             try {
-                const raw = localStorage.getItem(SAVED_STORAGE_KEY);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed : [];
-            } catch {
-                return [];
-            }
-        }
-
-        function guardarEnLocalStorage() {
-            try {
-                localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(savedPostIds));
-            } catch (err) {
-                console.error("No se pudo guardar en localStorage:", err);
-            }
-        }
-
-        // =========================================================
-        // 3. REFERENCIAS AL DOM
-        // =========================================================
-        const scrollContainer = document.getElementById("scroll-container");
-        const feedList = document.getElementById("feed-list");
-        const feedBanner = document.getElementById("feed-banner");
-        const feedBannerText = document.getElementById("feed-banner-text");
-        const feedBannerAction = document.getElementById("feed-banner-action");
-
-        const headerAvatarBadge = document.getElementById("header-avatar-badge");
-        const navProfileBadge = document.getElementById("nav-profile-badge");
-        const yourStoryAvatar = document.getElementById("your-story-avatar");
-
-        const searchBarContainer = document.getElementById("search-bar-container");
-        const searchInput = document.getElementById("search-input");
-        const btnClearSearch = document.getElementById("btn-clear-search");
-
-        // Modales
-        const authModal = document.getElementById("auth-modal");
-        const profileModal = document.getElementById("profile-modal");
-        const newPostModal = document.getElementById("new-post-modal");
-        const deleteModal = document.getElementById("delete-modal");
-
-        // Auth Form
-        const tabLogin = document.getElementById("tab-login");
-        const tabRegister = document.getElementById("tab-register");
-        const fieldNameWrap = document.getElementById("field-name-wrap");
-        const authForm = document.getElementById("auth-form");
-        const authNameInput = document.getElementById("auth-name");
-        const authEmailInput = document.getElementById("auth-email");
-        const authPassInput = document.getElementById("auth-password");
-        const authErrorBox = document.getElementById("auth-error");
-        const authSubmitBtn = document.getElementById("auth-submit-btn");
-        const authSubmitText = document.getElementById("auth-submit-text");
-        const authSubmitSpinner = document.getElementById("auth-submit-spinner");
-
-        // Profile Modal
-        const profileAvatarLg = document.getElementById("profile-avatar-lg");
-        const profileNameEl = document.getElementById("profile-name");
-        const profileEmailEl = document.getElementById("profile-email");
-        const profilePostsCountEl = document.getElementById("profile-posts-count");
-        const profileSavedCountEl = document.getElementById("profile-saved-count");
-
-        // New Post Form
-        const newPostForm = document.getElementById("new-post-form");
-        const postFileInput = document.getElementById("post-file-input");
-        const btnToggleUrlInput = document.getElementById("btn-toggle-url-input");
-        const postUrlWrap = document.getElementById("post-url-wrap");
-        const postUrlInput = document.getElementById("post-url-input");
-        const postPreviewWrap = document.getElementById("post-preview-wrap");
-        const postPreviewImg = document.getElementById("post-preview-img");
-        const postPreviewBadge = document.getElementById("post-preview-badge");
-        const btnRemovePreview = document.getElementById("btn-remove-preview");
-        const postLocationInput = document.getElementById("post-location");
-        const postCaptionInput = document.getElementById("post-caption");
-        const btnPublishSubmit = document.getElementById("btn-publish-submit");
-        const publishBtnText = document.getElementById("publish-btn-text");
-        const publishBtnSpinner = document.getElementById("publish-btn-spinner");
-
-        // =========================================================
-        // 4. UTILIDADES (Toast, XSS, Fechas, Colores, Clipboard)
-        // =========================================================
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            if (!toast) return;
-            toast.textContent = message;
-            toast.classList.remove("opacity-0", "translate-y-2");
-            toast.classList.add("opacity-100", "translate-y-0");
-
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toast.classList.remove("opacity-100", "translate-y-0");
-                toast.classList.add("opacity-0", "translate-y-2");
-            }, 2600);
-        }
-
-        function escapeHtml(str) {
-            return String(str ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        function getInitial(nameOrEmail) {
-            const clean = (nameOrEmail || "U").trim();
-            return clean.charAt(0).toUpperCase();
-        }
-
-        function getAvatarColor(seedStr) {
-            const gradients = [
-                "from-rose-500 to-orange-500",
-                "from-fuchsia-600 to-pink-500",
-                "from-indigo-500 to-purple-600",
-                "from-emerald-500 to-teal-600",
-                "from-amber-500 to-rose-500",
-                "from-sky-500 to-blue-600"
-            ];
-            let hash = 0;
-            const s = String(seedStr || "A");
-            for (let i = 0; i < s.length; i++) {
-                hash = s.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            return gradients[Math.abs(hash) % gradients.length];
-        }
-
-        function formatRelativeTime(timestamp) {
-            let ms = Date.now();
-            if (timestamp && typeof timestamp.toMillis === "function") {
-                ms = timestamp.toMillis();
-            } else if (typeof timestamp === "number") {
-                ms = timestamp;
-            }
-            const diffSec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
-            if (diffSec < 60) return "Hace un momento";
-            const diffMin = Math.floor(diffSec / 60);
-            if (diffMin < 60) return `Hace ${diffMin} min`;
-            const diffHr = Math.floor(diffMin / 60);
-            if (diffHr < 24) return `Hace ${diffHr} h`;
-            const diffDays = Math.floor(diffHr / 24);
-            if (diffDays === 1) return "Hace 1 día";
-            if (diffDays < 30) return `Hace ${diffDays} días`;
-            return new Date(ms).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
-        }
-
-        function copyTextFallback(text) {
-            try {
-                const ta = document.createElement("textarea");
-                ta.value = text;
-                ta.style.position = "fixed";
-                ta.style.opacity = "0";
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand("copy");
-                document.body.removeChild(ta);
-                showToast("Enlace copiado para compartir");
-            } catch {
-                showToast("Listo para compartir");
-            }
-        }
-
-        function openModal(modalEl) {
-            modalEl.classList.remove("hidden");
-        }
-
-        function closeModal(modalEl) {
-            modalEl.classList.add("hidden");
-        }
-
-        function closeAllModals() {
-            [authModal, profileModal, newPostModal, deleteModal].forEach(closeModal);
-        }
-
-        // Cerrar modales al hacer clic en botones [data-close-modal] o en el fondo oscuro
-        document.querySelectorAll("[data-close-modal]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const id = btn.getAttribute("data-close-modal");
-                const target = document.getElementById(id);
-                if (target) closeModal(target);
-            });
+              await navigator.share({
+                title: "Estemos Comunicados",
+                text: post.caption || "Mirá esta publicación en Estemos Comunicados",
+                url: window.location.href
+              });
+            } catch {}
+          } else {
+            navigator.clipboard?.writeText(window.location.href);
+            showToast("Enlace copiado");
+          }
         });
 
-        [authModal, profileModal, newPostModal, deleteModal].forEach((modal) => {
-            modal.addEventListener("click", (e) => {
-                if (e.target === modal) closeModal(modal);
-            });
-        });
-
-        // =========================================================
-        // 5. AUTENTICACIÓN CON FIREBASE AUTH
-        // =========================================================
-        function setAuthMode(mode) {
-            authMode = mode;
-            authErrorBox.classList.add("hidden");
-            if (mode === "register") {
-                tabRegister.className = "py-2 text-sm font-semibold rounded-lg bg-white text-gray-900 shadow-sm transition";
-                tabLogin.className = "py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-800 transition";
-                fieldNameWrap.classList.remove("hidden");
-                authNameInput.required = true;
-                authSubmitText.textContent = "Crear cuenta";
-            } else {
-                tabLogin.className = "py-2 text-sm font-semibold rounded-lg bg-white text-gray-900 shadow-sm transition";
-                tabRegister.className = "py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-800 transition";
-                fieldNameWrap.classList.add("hidden");
-                authNameInput.required = false;
-                authSubmitText.textContent = "Iniciar sesión";
-            }
+        const delBtn = article.querySelector(".delete-btn");
+        if (delBtn) {
+          delBtn.addEventListener("click", () => {
+            pendingDeleteId = post.id;
+            modalDelete.classList.remove("hidden");
+          });
         }
 
-        tabLogin.addEventListener("click", () => setAuthMode("login"));
-        tabRegister.addEventListener("click", () => setAuthMode("register"));
+        feedContainer.appendChild(article);
+      });
+    }
 
-        function translateAuthError(code) {
-            switch (code) {
-                case "auth/email-already-in-use":
-                    return "Ese correo ya está registrado. Probá iniciar sesión.";
-                case "auth/invalid-email":
-                    return "El formato del correo electrónico no es válido.";
-                case "auth/weak-password":
-                    return "La contraseña es muy débil. Usá al menos 6 caracteres.";
-                case "auth/wrong-password":
-                case "auth/user-not-found":
-                case "auth/invalid-credential":
-                    return "Correo o contraseña incorrectos. Revisá tus datos.";
-                case "auth/operation-not-allowed":
-                    return "El acceso con Correo/Contraseña no está activado en Firebase Console (Authentication → Sign-in method).";
-                case "auth/too-many-requests":
-                    return "Demasiados intentos seguidos. Esperá un momento y volvé a intentar.";
-                default:
-                    return "No pudimos completar la operación. Intentá nuevamente.";
-            }
+    // Renderizar Perfil
+    function renderProfile() {
+      const loggedOut = document.getElementById("profile-logged-out");
+      const loggedIn = document.getElementById("profile-logged-in");
+      if (!currentUser) {
+        loggedOut.classList.remove("hidden");
+        loggedIn.classList.add("hidden");
+        return;
+      }
+      loggedOut.classList.add("hidden");
+      loggedIn.classList.remove("hidden");
+
+      const displayName = currentUser.displayName || currentUser.email.split("@")[0];
+      document.getElementById("profile-avatar").textContent = displayName[0];
+      document.getElementById("profile-name").textContent = displayName;
+      document.getElementById("profile-email").textContent = currentUser.email;
+
+      const myPosts = allPosts.filter((p) => p.uid === currentUser.uid);
+      const totalLikes = myPosts.reduce((acc, p) => acc + (Array.isArray(p.likedBy) ? p.likedBy.length : 0), 0);
+      document.getElementById("stat-posts").textContent = myPosts.length;
+      document.getElementById("stat-likes").textContent = totalLikes;
+
+      const grid = document.getElementById("profile-posts-grid");
+      const noPosts = document.getElementById("profile-no-posts");
+      grid.innerHTML = "";
+      noPosts.classList.toggle("hidden", myPosts.length > 0);
+
+      myPosts.forEach((p) => {
+        const cell = document.createElement("div");
+        cell.className = "aspect-square bg-gray-100 overflow-hidden relative group";
+        const img = document.createElement("img");
+        img.src = p.imageUrl;
+        img.className = "w-full h-full object-cover";
+        img.alt = "Mi publicación";
+        cell.appendChild(img);
+        grid.appendChild(cell);
+      });
+    }
+
+    // Escuchar Firestore en tiempo real
+    const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    onSnapshot(postsQuery, (snapshot) => {
+      feedLoading.classList.add("hidden");
+      allPosts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderFeed();
+      if (currentTab === "profile") renderProfile();
+    }, (error) => {
+      feedLoading.classList.add("hidden");
+      showToast("Error conectando con Firestore");
+      console.error(error);
+    });
+
+    renderStories();
+  </script>
+
+  <!-- PWA Service Worker + Botón Instalar -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("btn-install-pwa");
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isStandalone) {
+        installBtn.classList.remove("hidden");
+        installBtn.classList.add("flex");
+      }
+    });
+
+    if (isIOS && !isStandalone) {
+      installBtn.classList.remove("hidden");
+      installBtn.classList.add("flex");
+    }
+
+    installBtn.addEventListener("click", async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          installBtn.classList.add("hidden");
+          installBtn.classList.remove("flex");
         }
-
-        authForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            authErrorBox.classList.add("hidden");
-
-            const email = authEmailInput.value.trim();
-            const password = authPassInput.value;
-            const fullName = authNameInput.value.trim();
-
-            if (authMode === "register" && fullName.length < 2) {
-                authErrorBox.textContent = "Ingresá tu nombre completo para crear la cuenta.";
-                authErrorBox.classList.remove("hidden");
-                return;
-            }
-
-            authSubmitBtn.disabled = true;
-            authSubmitSpinner.classList.remove("hidden");
-
-            try {
-                if (authMode === "register") {
-                    const cred = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(cred.user, { displayName: fullName });
-                    currentUser = cred.user;
-                    updateAuthUI();
-                    showToast(`¡Bienvenido/a, ${fullName}!`);
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    showToast("Sesión iniciada correctamente");
-                }
-                authForm.reset();
-                closeModal(authModal);
-            } catch (err) {
-                console.error("Error Firebase Auth:", err);
-                authErrorBox.textContent = translateAuthError(err.code);
-                authErrorBox.classList.remove("hidden");
-            } finally {
-                authSubmitBtn.disabled = false;
-                authSubmitSpinner.classList.add("hidden");
-            }
-        });
-
-        document.getElementById("btn-logout").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                closeModal(profileModal);
-                showToast("Cerraste sesión");
-            } catch (err) {
-                console.error("Error al cerrar sesión:", err);
-                showToast("Error al cerrar sesión");
-            }
-        });
-
-        function updateAuthUI() {
-            if (currentUser) {
-                const displayName = currentUser.displayName || currentUser.email.split("@")[0];
-                const initial = getInitial(displayName);
-                const grad = getAvatarColor(currentUser.uid);
-
-                headerAvatarBadge.className = `w-7 h-7 rounded-full bg-gradient-to-tr ${grad} text-white text-xs font-bold flex items-center justify-center shadow-sm`;
-                headerAvatarBadge.textContent = initial;
-
-                navProfileBadge.className = `w-7 h-7 rounded-full bg-gradient-to-tr ${grad} text-white text-xs font-bold flex items-center justify-center ring-2 ring-gray-900`;
-                navProfileBadge.textContent = initial;
-
-                yourStoryAvatar.className = `w-16 h-16 rounded-full bg-gradient-to-tr ${grad} text-white flex items-center justify-center font-bold text-xl border border-gray-200 group-active:scale-95 transition`;
-                yourStoryAvatar.textContent = initial;
-
-                // Actualizar modal de perfil
-                profileAvatarLg.className = `w-16 h-16 rounded-full bg-gradient-to-tr ${grad} text-white text-2xl font-bold flex items-center justify-center shadow-md flex-shrink-0`;
-                profileAvatarLg.textContent = initial;
-                profileNameEl.textContent = displayName;
-                profileEmailEl.textContent = currentUser.email || "";
-                updateProfileStats();
-            } else {
-                headerAvatarBadge.className = "w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-semibold flex items-center justify-center";
-                headerAvatarBadge.innerHTML = '<i class="ph ph-user text-sm"></i>';
-
-                navProfileBadge.className = "w-7 h-7 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-700 text-xs font-bold flex items-center justify-center";
-                navProfileBadge.innerHTML = '<i class="ph ph-user text-sm"></i>';
-
-                yourStoryAvatar.className = "w-16 h-16 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 text-white flex items-center justify-center font-bold text-lg border border-gray-200 group-active:scale-95 transition";
-                yourStoryAvatar.innerHTML = '<i class="ph ph-user text-2xl"></i>';
-            }
-
-            if (hasLoadedFirestore) {
-                renderFeed();
-            }
-        }
-
-        function updateProfileStats() {
-            if (!currentUser) return;
-            const myPostsCount = firestorePosts.filter((p) => p.uid === currentUser.uid).length;
-            profilePostsCountEl.textContent = myPostsCount;
-            profileSavedCountEl.textContent = savedPostIds.length;
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateAuthUI();
-        });
-
-        function openProfileOrAuth() {
-            if (currentUser) {
-                updateProfileStats();
-                openModal(profileModal);
-            } else {
-                setAuthMode("login");
-                openModal(authModal);
-            }
-        }
-
-        function openNewPostOrPromptAuth() {
-            if (!currentUser) {
-                showToast("Iniciá sesión para publicar en Estemos Comunicados");
-                setAuthMode("login");
-                openModal(authModal);
-                return;
-            }
-            openModal(newPostModal);
-        }
-
-        // =========================================================
-        // 6. NUEVA PUBLICACIÓN (COMPRESIÓN CANVAS + URL + FIRESTORE)
-        // =========================================================
-        function resetNewPostForm() {
-            newPostForm.reset();
-            compressedBase64Image = "";
-            postPreviewImg.src = "";
-            postPreviewWrap.classList.add("hidden");
-            postUrlWrap.classList.add("hidden");
-        }
-
-        /**
-         * Redimensiona y comprime una imagen elegida desde la galería (máx 800px, JPEG 0.72)
-         * para guardarla liviana directamente en Firestore sin necesidad de Storage pago.
-         */
-        function compressImageFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onerror = () => reject(new Error("No se pudo leer el archivo."));
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onerror = () => reject(new Error("El archivo no es una imagen válida."));
-                    img.onload = () => {
-                        const MAX_SIZE = 800;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height) {
-                            if (width > MAX_SIZE) {
-                                height = Math.round((height * MAX_SIZE) / width);
-                                width = MAX_SIZE;
-                            }
-                        } else {
-                            if (height > MAX_SIZE) {
-                                width = Math.round((width * MAX_SIZE) / height);
-                                height = MAX_SIZE;
-                            }
-                        }
-
-                        const canvas = document.createElement("canvas");
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
-                        resolve(dataUrl);
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        postFileInput.addEventListener("change", async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-
-            try {
-                showToast("Optimizando imagen...");
-                const dataUrl = await compressImageFile(file);
-                compressedBase64Image = dataUrl;
-                postUrlInput.value = "";
-                postUrlWrap.classList.add("hidden");
-
-                postPreviewImg.src = dataUrl;
-                postPreviewBadge.textContent = "Foto optimizada desde galería";
-                postPreviewWrap.classList.remove("hidden");
-                showToast("Imagen lista para publicar");
-            } catch (err) {
-                console.error("Error al comprimir imagen:", err);
-                showToast("No se pudo procesar la imagen elegida");
-            }
-        });
-
-        btnToggleUrlInput.addEventListener("click", () => {
-            postUrlWrap.classList.toggle("hidden");
-            if (!postUrlWrap.classList.contains("hidden")) {
-                postUrlInput.focus();
-            }
-        });
-
-        postUrlInput.addEventListener("input", () => {
-            const url = postUrlInput.value.trim();
-            if (url.startsWith("http://") || url.startsWith("https://")) {
-                compressedBase64Image = "";
-                postFileInput.value = "";
-                postPreviewImg.src = url;
-                postPreviewBadge.textContent = "Vista previa desde URL";
-                postPreviewWrap.classList.remove("hidden");
-            } else if (!compressedBase64Image) {
-                postPreviewWrap.classList.add("hidden");
-            }
-        });
-
-        btnRemovePreview.addEventListener("click", () => {
-            compressedBase64Image = "";
-            postFileInput.value = "";
-            postUrlInput.value = "";
-            postPreviewImg.src = "";
-            postPreviewWrap.classList.add("hidden");
-        });
-
-        newPostForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                closeModal(newPostModal);
-                openNewPostOrPromptAuth();
-                return;
-            }
-
-            const imageUrl = compressedBase64Image || postUrlInput.value.trim();
-            const location = postLocationInput.value.trim();
-            const caption = postCaptionInput.value.trim();
-
-            if (!imageUrl) {
-                showToast("Agregá una foto desde tu galería o pegá una URL");
-                return;
-            }
-
-            btnPublishSubmit.disabled = true;
-            publishBtnText.textContent = "Publicando...";
-            publishBtnSpinner.classList.remove("hidden");
-
-            try {
-                const authorName = currentUser.displayName || currentUser.email.split("@")[0];
-                await addDoc(collection(db, "posts"), {
-                    uid: currentUser.uid,
-                    author: authorName,
-                    location: location,
-                    imageUrl: imageUrl,
-                    caption: caption,
-                    likes: 0,
-                    likedBy: [],
-                    createdAt: serverTimestamp()
-                });
-
-                resetNewPostForm();
-                closeModal(newPostModal);
-                activeFilter = "all";
-                updateNavActiveState("home");
-                scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-                showToast("¡Publicación compartida en tiempo real!");
-            } catch (err) {
-                console.error("Error al publicar en Firestore:", err);
-                showToast("Error al publicar. Revisá las reglas de Firestore.");
-            } finally {
-                btnPublishSubmit.disabled = false;
-                publishBtnText.textContent = "Publicar";
-                publishBtnSpinner.classList.add("hidden");
-            }
-        });
-
-        // =========================================================
-        // 7. FEED EN TIEMPO REAL (FIRESTORE onSnapshot + DEMOS)
-        // =========================================================
-        const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-
-        onSnapshot(
-            postsQuery,
-            (snapshot) => {
-                hasLoadedFirestore = true;
-                firestorePosts = snapshot.docs.map((d) => ({
-                    id: d.id,
-                    isDemo: false,
-                    ...d.data()
-                }));
-                updateProfileStats();
-                renderFeed();
-            },
-            (error) => {
-                console.error("Error escuchando Firestore:", error);
-                hasLoadedFirestore = true;
-                firestorePosts = [];
-                renderFeed();
-                showToast("Mostrando vista previa (revisá tu conexión o Firestore)");
-            }
-        );
-
-        function getActivePostSource() {
-            return firestorePosts.length > 0 ? firestorePosts : demoPosts;
-        }
-
-        function renderFeed() {
-            const sourcePosts = getActivePostSource();
-            const usingDemo = firestorePosts.length === 0;
-
-            // Configurar banner superior según estado
-            if (activeFilter === "saved") {
-                feedBanner.classList.remove("hidden");
-                feedBannerText.textContent = "Mostrando tus publicaciones guardadas";
-                feedBannerAction.textContent = "Ver todo";
-                feedBannerAction.onclick = () => {
-                    activeFilter = "all";
-                    updateNavActiveState("home");
-                    renderFeed();
-                };
-            } else if (usingDemo) {
-                feedBanner.classList.remove("hidden");
-                feedBannerText.textContent = "Publicaciones de ejemplo. ¡Sé el primero en publicar algo real!";
-                feedBannerAction.textContent = "Publicar";
-                feedBannerAction.onclick = () => openNewPostOrPromptAuth();
-            } else {
-                feedBanner.classList.add("hidden");
-            }
-
-            // Aplicar filtros (Guardados y Búsqueda)
-            let filtered = sourcePosts.filter((post) => {
-                if (activeFilter === "saved" && !savedPostIds.includes(post.id)) {
-                    return false;
-                }
-                if (searchQuery) {
-                    const q = searchQuery.toLowerCase();
-                    const hay = `${post.author || ""} ${post.location || ""} ${post.caption || ""}`.toLowerCase();
-                    if (!hay.includes(q)) return false;
-                }
-                return true;
-            });
-
-            feedList.innerHTML = "";
-
-            if (filtered.length === 0) {
-                const empty = document.createElement("div");
-                empty.className = "p-10 text-center text-gray-500 flex flex-col items-center gap-2";
-                empty.innerHTML = `
-                    <i class="ph ph-${activeFilter === "saved" ? "bookmark-simple" : "magnifying-glass"} text-4xl text-gray-300"></i>
-                    <p class="text-sm font-medium text-gray-700">${
-                        activeFilter === "saved"
-                            ? "Todavía no guardaste publicaciones"
-                            : "No encontramos resultados para tu búsqueda"
-                    }</p>
-                    <p class="text-xs text-gray-400">${
-                        activeFilter === "saved"
-                            ? "Tocá el ícono de marcador en cualquier foto para guardarla acá."
-                            : "Probá con otra palabra clave."
-                    }</p>
-                `;
-                feedList.appendChild(empty);
-                return;
-            }
-
-            filtered.forEach((post) => {
-                feedList.appendChild(createPostCardElement(post));
-            });
-        }
-
-        function createPostCardElement(post) {
-            const article = document.createElement("article");
-            article.className = "pb-4 bg-white";
-
-            const authorSafe = escapeHtml(post.author || "Usuario");
-            const locationSafe = escapeHtml(post.location || "");
-            const captionSafe = escapeHtml(post.caption || "");
-            const initial = getInitial(post.author);
-            const avatarGrad = getAvatarColor(post.uid || post.author);
-            const relTime = formatRelativeTime(post.isDemo ? post.createdAtMs : post.createdAt);
-
-            const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
-            const isLiked = post.isDemo
-                ? Boolean(post.likedLocally)
-                : Boolean(currentUser && likedBy.includes(currentUser.uid));
-            const likesCount = typeof post.likes === "number" ? post.likes : likedBy.length;
-            const isSaved = savedPostIds.includes(post.id);
-            const canDelete = !post.isDemo && currentUser && currentUser.uid === post.uid;
-
-            article.innerHTML = `
-                <!-- Cabecera del post -->
-                <div class="flex justify-between items-center px-3.5 py-2.5">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${avatarGrad} text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-xs">
-                            ${escapeHtml(initial)}
-                        </div>
-                        <div class="leading-tight min-w-0">
-                            <p class="font-semibold text-sm text-gray-900 truncate">${authorSafe}</p>
-                            ${locationSafe ? `<p class="text-[11px] text-gray-500 truncate">${locationSafe}</p>` : ""}
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1 flex-shrink-0">
-                        ${
-                            canDelete
-                                ? `<button type="button" class="btn-delete-post p-1.5 rounded-full text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition" aria-label="Eliminar publicación">
-                                       <i class="ph ph-trash text-lg"></i>
-                                   </button>`
-                                : ""
-                        }
-                    </div>
-                </div>
-
-                <!-- Foto del post (doble toque / doble clic para Me gusta) -->
-                <div class="post-image-box w-full aspect-square bg-gray-100 relative overflow-hidden cursor-pointer select-none">
-                    <img src="${escapeHtml(post.imageUrl)}" alt="Publicación de ${authorSafe}" onerror="this.src='https://placehold.co/800x800/e2e8f0/475569?text=Estemos+Comunicados'" class="w-full h-full object-cover">
-                    <div class="big-heart-overlay absolute inset-0 flex items-center justify-center pointer-events-none opacity-0">
-                        <i class="ph-fill ph-heart text-white text-8xl drop-shadow-2xl"></i>
-                    </div>
-                </div>
-
-                <!-- Barra de acciones -->
-                <div class="flex justify-between items-center px-3.5 py-2.5">
-                    <div class="flex items-center gap-4">
-                        <button type="button" class="btn-like hover:opacity-70 active:scale-90 transition text-[26px]" aria-label="Me gusta">
-                            <i class="${isLiked ? "ph-fill ph-heart text-rose-500" : "ph ph-heart text-gray-900"}"></i>
-                        </button>
-                        <button type="button" class="btn-comment hover:opacity-70 active:scale-90 transition text-[26px] text-gray-900" aria-label="Comentar">
-                            <i class="ph ph-chat-circle"></i>
-                        </button>
-                        <button type="button" class="btn-share hover:opacity-70 active:scale-90 transition text-[26px] text-gray-900" aria-label="Compartir">
-                            <i class="ph ph-paper-plane-tilt"></i>
-                        </button>
-                    </div>
-                    <button type="button" class="btn-save hover:opacity-70 active:scale-90 transition text-[26px] text-gray-900" aria-label="Guardar">
-                        <i class="${isSaved ? "ph-fill ph-bookmark-simple text-gray-900" : "ph ph-bookmark-simple text-gray-900"}"></i>
-                    </button>
-                </div>
-
-                <!-- Contador, descripción y tiempo relativo -->
-                <div class="px-4 text-sm space-y-1">
-                    <p class="font-semibold text-gray-900"><span class="like-count">${likesCount.toLocaleString("es-AR")}</span> Me gusta</p>
-                    ${
-                        captionSafe
-                            ? `<p class="text-gray-800 leading-snug break-words">
-                                   <span class="font-semibold text-gray-900 mr-1">${authorSafe}</span>${captionSafe}
-                               </p>`
-                            : ""
-                    }
-                    <p class="text-gray-400 text-[10px] uppercase tracking-wide pt-0.5">${escapeHtml(relTime)}</p>
-                </div>
-            `;
-
-            // Eventos de la tarjeta
-            const likeBtn = article.querySelector(".btn-like");
-            const imageBox = article.querySelector(".post-image-box");
-            const bigHeart = article.querySelector(".big-heart-overlay");
-            const saveBtn = article.querySelector(".btn-save");
-            const commentBtn = article.querySelector(".btn-comment");
-            const shareBtn = article.querySelector(".btn-share");
-            const deleteBtn = article.querySelector(".btn-delete-post");
-
-            likeBtn.addEventListener("click", () => toggleLike(post, false, likeBtn));
-
-            // Doble clic (PC) y doble toque (móvil) en la foto
-            imageBox.addEventListener("dblclick", () => {
-                triggerBigHeart(bigHeart);
-                toggleLike(post, true, likeBtn);
-            });
-
-            imageBox.addEventListener("click", () => {
-                const now = Date.now();
-                const prev = lastTapMap[post.id] || 0;
-                if (now - prev < 300) {
-                    triggerBigHeart(bigHeart);
-                    toggleLike(post, true, likeBtn);
-                    lastTapMap[post.id] = 0;
-                } else {
-                    lastTapMap[post.id] = now;
-                }
-            });
-
-            saveBtn.addEventListener("click", () => toggleBookmark(post.id, saveBtn));
-
-            commentBtn.addEventListener("click", () => {
-                showToast(`Comentarios de ${post.author || "la publicación"} próximamente`);
-            });
-
-            shareBtn.addEventListener("click", () => {
-                copyTextFallback(window.location.href);
-            });
-
-            if (deleteBtn) {
-                deleteBtn.addEventListener("click", () => {
-                    postIdToDelete = post.id;
-                    openModal(deleteModal);
-                });
-            }
-
-            return article;
-        }
-
-        function triggerBigHeart(bigHeartEl) {
-            if (!bigHeartEl) return;
-            bigHeartEl.classList.remove("big-heart-pop");
-            void bigHeartEl.offsetWidth;
-            bigHeartEl.classList.add("big-heart-pop");
-        }
-
-        // =========================================================
-        // 8. LIKES EN TIEMPO REAL, GUARDADOS Y ELIMINAR POST
-        // =========================================================
-        async function toggleLike(post, onlyAddLike, likeBtnEl) {
-            const icon = likeBtnEl?.querySelector("i");
-            if (icon) {
-                icon.classList.add("pop-animation");
-                setTimeout(() => icon.classList.remove("pop-animation"), 320);
-            }
-
-            // Caso 1: Publicación de demostración (estado local)
-            if (post.isDemo) {
-                if (onlyAddLike && post.likedLocally) return;
-                post.likedLocally = !post.likedLocally;
-                post.likes += post.likedLocally ? 1 : -1;
-                renderFeed();
-                return;
-            }
-
-            // Caso 2: Publicación real en Firestore
-            if (!currentUser) {
-                showToast("Iniciá sesión para dar Me gusta");
-                setAuthMode("login");
-                openModal(authModal);
-                return;
-            }
-
-            const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
-            const alreadyLiked = likedBy.includes(currentUser.uid);
-
-            if (onlyAddLike && alreadyLiked) return;
-
-            try {
-                const postRef = doc(db, "posts", post.id);
-                if (alreadyLiked) {
-                    await updateDoc(postRef, {
-                        likedBy: arrayRemove(currentUser.uid),
-                        likes: increment(-1)
-                    });
-                } else {
-                    await updateDoc(postRef, {
-                        likedBy: arrayUnion(currentUser.uid),
-                        likes: increment(1)
-                    });
-                }
-            } catch (err) {
-                console.error("Error al actualizar Me gusta:", err);
-                showToast("No se pudo actualizar el Me gusta");
-            }
-        }
-
-        function toggleBookmark(postId, btnEl) {
-            const idx = savedPostIds.indexOf(postId);
-            const icon = btnEl?.querySelector("i");
-
-            if (idx === -1) {
-                savedPostIds.push(postId);
-                if (icon) icon.className = "ph-fill ph-bookmark-simple text-gray-900 pop-animation";
-                showToast("Publicación guardada");
-            } else {
-                savedPostIds.splice(idx, 1);
-                if (icon) icon.className = "ph ph-bookmark-simple text-gray-900 pop-animation";
-                showToast("Eliminada de guardados");
-            }
-
-            guardarEnLocalStorage();
-            updateProfileStats();
-
-            if (activeFilter === "saved") {
-                renderFeed();
-            }
-        }
-
-        document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
-            if (!postIdToDelete) return;
-            try {
-                await deleteDoc(doc(db, "posts", postIdToDelete));
-                showToast("Publicación eliminada");
-            } catch (err) {
-                console.error("Error al eliminar publicación:", err);
-                showToast("No se pudo eliminar la publicación");
-            } finally {
-                postIdToDelete = null;
-                closeModal(deleteModal);
-            }
-        });
-
-        // =========================================================
-        // 9. NAVEGACIÓN, BÚSQUEDA E INTERACCIONES DE CABECERA
-        // =========================================================
-        const navHome = document.getElementById("nav-home");
-        const navSearch = document.getElementById("nav-search");
-        const navCreate = document.getElementById("nav-create");
-        const navSaved = document.getElementById("nav-saved");
-        const navProfile = document.getElementById("nav-profile");
-
-        function updateNavActiveState(active) {
-            navHome.innerHTML = `<i class="${active === "home" ? "ph-fill text-gray-900" : "ph text-gray-500"} ph-house text-[26px]"></i>`;
-            navSearch.innerHTML = `<i class="${active === "search" ? "ph-bold text-gray-900" : "ph text-gray-500"} ph-magnifying-glass text-[26px]"></i>`;
-            navSaved.innerHTML = `<i class="${active === "saved" ? "ph-fill text-gray-900" : "ph text-gray-500"} ph-bookmark-simple text-[26px]"></i>`;
-        }
-
-        document.getElementById("brand-logo-btn").addEventListener("click", () => {
-            activeFilter = "all";
-            searchQuery = "";
-            searchInput.value = "";
-            searchBarContainer.classList.add("hidden");
-            updateNavActiveState("home");
-            renderFeed();
-            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        navHome.addEventListener("click", () => {
-            activeFilter = "all";
-            searchBarContainer.classList.add("hidden");
-            updateNavActiveState("home");
-            renderFeed();
-            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        navSearch.addEventListener("click", () => {
-            const isHidden = searchBarContainer.classList.toggle("hidden");
-            if (!isHidden) {
-                updateNavActiveState("search");
-                searchInput.focus();
-            } else {
-                searchQuery = "";
-                searchInput.value = "";
-                btnClearSearch.classList.add("hidden");
-                updateNavActiveState(activeFilter === "saved" ? "saved" : "home");
-                renderFeed();
-            }
-        });
-
-        searchInput.addEventListener("input", () => {
-            searchQuery = searchInput.value.trim();
-            btnClearSearch.classList.toggle("hidden", !searchQuery);
-            renderFeed();
-        });
-
-        btnClearSearch.addEventListener("click", () => {
-            searchQuery = "";
-            searchInput.value = "";
-            btnClearSearch.classList.add("hidden");
-            renderFeed();
-            searchInput.focus();
-        });
-
-        navCreate.addEventListener("click", openNewPostOrPromptAuth);
-        document.getElementById("btn-your-story").addEventListener("click", openNewPostOrPromptAuth);
-        document.getElementById("btn-profile-new-post").addEventListener("click", () => {
-            closeModal(profileModal);
-            openModal(newPostModal);
-        });
-
-        navSaved.addEventListener("click", () => {
-            if (activeFilter === "saved") {
-                activeFilter = "all";
-                updateNavActiveState("home");
-            } else {
-                activeFilter = "saved";
-                updateNavActiveState("saved");
-                showToast("Mostrando tus guardados");
-            }
-            renderFeed();
-            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        navProfile.addEventListener("click", openProfileOrAuth);
-        document.getElementById("btn-header-profile").addEventListener("click", openProfileOrAuth);
-
-        document.getElementById("btn-notifications").addEventListener("click", () => {
-            showToast("No tenés notificaciones nuevas por ahora");
-        });
-
-        document.getElementById("btn-messages").addEventListener("click", () => {
-            showToast("Bandeja de mensajes (3 conversaciones)");
-        });
-
-        document.querySelectorAll(".story-item").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const name = btn.getAttribute("data-story");
-                showToast(`Viendo historia de ${name}`);
-            });
-        });
-    </script>
+        deferredPrompt = null;
+      } else if (isIOS) {
+        alert('Para instalar en iPhone: tocá el botón "Compartir" (cuadrado con flecha) y elegí "Agregar a inicio".');
+      }
+    });
+
+    window.addEventListener("appinstalled", () => {
+      installBtn.classList.add("hidden");
+      installBtn.classList.remove("flex");
+      deferredPrompt = null;
+    });
+  </script>
 </body>
 </html>
