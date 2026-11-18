@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Estemos Comunicados</title>
 
+  <!-- Open Graph / Vista previa WhatsApp y Redes -->
+  <meta name="description" content="La red social de nuestra comunidad. Compartí fotos, historias, noticias, eventos y comercios en tiempo real." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://comunicados-as.vercel.app/" />
+  <meta property="og:title" content="Estemos Comunicados" />
+  <meta property="og:description" content="Sumate a Estemos Comunicados: fotos, historias de 24 hs, noticias, eventos y todo lo que pasa en la comunidad." />
+  <meta property="og:image" content="https://comunicados-as.vercel.app/icon-512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Estemos Comunicados" />
+  <meta name="twitter:description" content="Sumate a la red social de la comunidad." />
+  <meta name="twitter:image" content="https://comunicados-as.vercel.app/icon-512.png" />
+
   <!-- PWA Config -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
@@ -61,6 +75,13 @@
     .animate-btn-bounce {
       animation: btnBounce 0.25s ease-in-out;
     }
+    @keyframes postHighlight {
+      0% { box-shadow: inset 0 0 0 3px #ec4899; }
+      100% { box-shadow: inset 0 0 0 0px transparent; }
+    }
+    .animate-post-highlight {
+      animation: postHighlight 2.2s ease-out forwards;
+    }
   </style>
 </head>
 <body class="bg-gray-100 dark:bg-zinc-950 md:py-6 flex justify-center min-h-[100dvh] transition-colors">
@@ -74,12 +95,18 @@
         Estemos Comunicados
       </button>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <!-- Botón Instalar PWA -->
         <button id="btn-install-pwa"
-                class="hidden items-center gap-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
+                class="hidden items-center gap-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
           <i class="ph ph-download-simple text-sm"></i>
           <span>Instalar</span>
+        </button>
+
+        <!-- Botón Notificaciones -->
+        <button id="btn-notifications" class="hidden text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white p-1 active:scale-90 transition relative" title="Notificaciones">
+          <i class="ph ph-bell text-xl"></i>
+          <span id="notif-badge" class="hidden min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center">0</span>
         </button>
 
         <!-- Botón Modo Oscuro -->
@@ -101,7 +128,7 @@
     <div id="search-bar-wrap" class="hidden px-4 py-2.5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
       <div class="relative">
         <i class="ph ph-magnifying-glass text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-lg"></i>
-        <input id="search-input" type="text" placeholder="Buscar por usuario, lugar o texto..."
+        <input id="search-input" type="text" placeholder="Buscar por usuario, lugar, categoría o texto..."
                class="w-full bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 rounded-xl pl-9 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
         <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
           <i class="ph-fill ph-x-circle text-lg"></i>
@@ -119,11 +146,16 @@
           <div class="flex gap-3.5 overflow-x-auto no-scrollbar" id="stories-container"></div>
         </section>
 
+        <!-- Categorías rápidas -->
+        <section id="categories-section" class="border-b border-gray-100 dark:border-zinc-800 py-2.5 px-3">
+          <div class="flex gap-2 overflow-x-auto no-scrollbar" id="categories-container"></div>
+        </section>
+
         <!-- Banner invitación -->
         <div id="guest-banner" class="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/40 dark:to-purple-950/40 border border-pink-100 dark:border-pink-900/50 flex items-center justify-between gap-2">
           <div class="text-xs text-gray-700 dark:text-gray-300">
             <p class="font-semibold text-gray-900 dark:text-white">¡Sumate a la comunidad!</p>
-            <p>Creá tu cuenta para publicar, comentar y subir historias.</p>
+            <p>Entrá con Google o tu correo para publicar y comentar.</p>
           </div>
           <button id="btn-banner-login" class="shrink-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition">
             Ingresar
@@ -149,7 +181,7 @@
         <section id="feed-container" class="divide-y divide-gray-100 dark:divide-zinc-800 pb-6"></section>
       </div>
 
-      <!-- Vista Perfil -->
+      <!-- Vista Perfil Propio -->
       <div id="view-profile" class="hidden p-4 pb-8">
         <div id="profile-logged-out" class="py-10 text-center space-y-4">
           <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-0.5">
@@ -159,7 +191,7 @@
           </div>
           <div>
             <h2 class="font-bold text-gray-900 dark:text-white text-lg">Tu perfil en Estemos Comunicados</h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 px-4">Iniciá sesión o creá una cuenta para subir fotos, historias y comentar.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 px-4">Iniciá sesión en un clic con Google o creá una cuenta para subir fotos, historias y comentar.</p>
           </div>
           <button id="btn-profile-open-auth" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
             Iniciar sesión / Registrarse
@@ -171,7 +203,7 @@
             <!-- Avatar editable -->
             <label class="relative cursor-pointer shrink-0 group" title="Cambiar foto de perfil">
               <input id="avatar-file-input" type="file" accept="image/*" class="hidden" />
-              <div id="profile-avatar-box" class="w-18 h-18 w-[72px] h-[72px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2.5px]">
+              <div id="profile-avatar-box" class="w-[72px] h-[72px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2.5px]">
                 <div id="profile-avatar-inner" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase overflow-hidden border-2 border-white dark:border-zinc-900">
                   U
                 </div>
@@ -182,8 +214,9 @@
             </label>
 
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <h2 id="profile-name" class="font-bold text-gray-900 dark:text-white text-base truncate">Usuario</h2>
+                <span id="profile-admin-badge" class="hidden text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300">Admin</span>
                 <button id="btn-edit-name" class="text-gray-400 hover:text-pink-500 p-0.5" title="Editar nombre">
                   <i class="ph ph-pencil-simple text-sm"></i>
                 </button>
@@ -238,14 +271,32 @@
       </button>
     </nav>
 
-    <!-- MODAL: Autenticación -->
+    <!-- MODAL: Autenticación (Google + Email + Recuperar clave) -->
     <div id="modal-auth" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t dark:border-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t dark:border-zinc-800 max-h-[92dvh] overflow-y-auto">
         <div class="flex items-center justify-between">
           <h3 id="auth-modal-title" class="font-bold text-gray-900 dark:text-white text-lg">Iniciar sesión</h3>
           <button id="close-auth-modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
             <i class="ph ph-x text-xl"></i>
           </button>
+        </div>
+
+        <!-- Botón Google en 1 clic -->
+        <button id="btn-google-login" type="button"
+                class="w-full flex items-center justify-center gap-2.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-800 dark:text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-xs active:scale-95 transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Continuar con Google</span>
+        </button>
+
+        <div class="flex items-center gap-2 text-[11px] text-gray-400">
+          <div class="h-px bg-gray-200 dark:bg-zinc-800 flex-1"></div>
+          <span>o con tu correo</span>
+          <div class="h-px bg-gray-200 dark:bg-zinc-800 flex-1"></div>
         </div>
 
         <div class="grid grid-cols-2 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl text-xs font-semibold">
@@ -265,12 +316,18 @@
                    class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Contraseña</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">Contraseña</label>
+              <button type="button" id="btn-forgot-pass" class="text-[11px] font-medium text-pink-600 dark:text-pink-400 hover:underline">
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
             <input id="auth-pass" type="password" required minlength="6" placeholder="Mínimo 6 caracteres"
                    class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
 
           <p id="auth-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2"></p>
+          <p id="auth-success" class="hidden text-xs text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-900 rounded-lg px-3 py-2"></p>
 
           <button id="auth-submit-btn" type="submit"
                   class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
@@ -312,8 +369,19 @@
           <input id="post-url" type="url" placeholder="https://ejemplo.com/foto.jpg"
                  class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
 
-          <input id="post-location" type="text" placeholder="Ubicación (ej: Arroyo Seco, Santa Fe)"
-                 class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          <div class="grid grid-cols-2 gap-2">
+            <select id="post-category"
+                    class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
+              <option value="Comunidad">Comunidad</option>
+              <option value="Noticias">Noticias</option>
+              <option value="Eventos">Eventos</option>
+              <option value="Comercios">Comercios</option>
+              <option value="Deportes">Deportes</option>
+            </select>
+
+            <input id="post-location" type="text" placeholder="Ubicación"
+                   class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          </div>
 
           <textarea id="post-caption" rows="2" placeholder="Escribí una descripción..."
                     class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none"></textarea>
@@ -366,18 +434,15 @@
 
     <!-- VISOR DE HISTORIAS PANTALLA COMPLETA -->
     <div id="story-viewer" class="hidden absolute inset-0 bg-black z-50 flex flex-col">
-      <!-- Barras de progreso -->
       <div id="story-progress-bars" class="flex gap-1 px-2.5 pt-2.5 z-20"></div>
-
-      <!-- Cabecera historia -->
       <div class="flex items-center justify-between px-3 py-2.5 z-20">
-        <div class="flex items-center gap-2.5 min-w-0">
+        <button id="sv-author-btn" class="flex items-center gap-2.5 min-w-0 text-left">
           <div id="sv-avatar" class="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-tr from-yellow-400 to-pink-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0"></div>
           <div class="min-w-0">
             <p id="sv-author" class="text-white text-sm font-semibold leading-tight truncate"></p>
             <p id="sv-time" class="text-white/70 text-[11px]"></p>
           </div>
-        </div>
+        </button>
         <div class="flex items-center gap-2">
           <button id="sv-delete-btn" class="hidden text-white/80 hover:text-red-400 p-1.5" title="Eliminar historia">
             <i class="ph ph-trash text-xl"></i>
@@ -388,7 +453,6 @@
         </div>
       </div>
 
-      <!-- Imagen + zonas táctiles izq/der -->
       <div class="flex-1 relative flex items-center justify-center overflow-hidden">
         <img id="sv-image" class="w-full h-full object-contain" alt="Historia" />
         <div id="sv-tap-prev" class="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer"></div>
@@ -421,6 +485,53 @@
       </div>
     </div>
 
+    <!-- MODAL: Perfil Público de otro usuario -->
+    <div id="modal-public-profile" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end justify-center">
+      <div class="bg-white dark:bg-zinc-900 w-full h-[85%] rounded-t-3xl flex flex-col shadow-2xl border-t dark:border-zinc-800 overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+          <h3 id="pp-header-title" class="font-bold text-gray-900 dark:text-white text-sm truncate">Perfil</h3>
+          <button id="close-public-profile" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-5 no-scrollbar">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2px] shrink-0">
+              <div id="pp-avatar" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase overflow-hidden border-2 border-white dark:border-zinc-900"></div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 id="pp-name" class="font-bold text-gray-900 dark:text-white text-base truncate"></h4>
+              <div class="flex gap-4 mt-1.5 text-xs">
+                <div><span id="pp-posts-count" class="font-bold text-gray-900 dark:text-white">0</span> <span class="text-gray-500 dark:text-gray-400">posts</span></div>
+                <div><span id="pp-likes-count" class="font-bold text-gray-900 dark:text-white">0</span> <span class="text-gray-500 dark:text-gray-400">likes</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-100 dark:border-zinc-800 pt-4">
+            <h5 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Publicaciones</h5>
+            <div id="pp-grid" class="grid grid-cols-3 gap-1"></div>
+            <p id="pp-empty" class="hidden text-center text-xs text-gray-400 py-8">Todavía no tiene publicaciones.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Notificaciones -->
+    <div id="modal-notifications" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end justify-center">
+      <div class="bg-white dark:bg-zinc-900 w-full h-[75%] rounded-t-3xl flex flex-col shadow-2xl border-t dark:border-zinc-800 overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+          <h3 class="font-bold text-gray-900 dark:text-white text-sm">Notificaciones</h3>
+          <button id="close-notifications" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <div id="notifications-list" class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800 no-scrollbar"></div>
+      </div>
+    </div>
+
     <!-- MODAL: Compartir publicación -->
     <div id="modal-share" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t dark:border-zinc-800">
@@ -443,7 +554,7 @@
           <button id="btn-share-copy"
                   class="w-full flex items-center justify-center gap-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white font-semibold py-2.5 px-4 rounded-xl text-sm active:scale-95 transition">
             <i class="ph ph-copy text-xl"></i>
-            <span>Copiar enlace</span>
+            <span>Copiar enlace directo</span>
           </button>
 
           <button id="btn-share-native"
@@ -484,8 +595,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
       getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
+      sendPasswordResetEmail,
       updateProfile,
       signOut,
       onAuthStateChanged
@@ -502,6 +616,7 @@
       arrayRemove,
       increment,
       query,
+      where,
       orderBy,
       onSnapshot,
       serverTimestamp
@@ -519,38 +634,56 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Administradores con permiso de moderación
+    const ADMIN_EMAILS = ["desarrolladorweb2s@gmail.com"];
+    const CATEGORIES = ["Todo", "Comunidad", "Noticias", "Eventos", "Comercios", "Deportes"];
 
     // Estado global
     let currentUser = null;
     let allPosts = [];
     let activeStories = [];
-    let usersMap = {}; // { uid: { displayName, photoURL } }
+    let usersMap = {};
+    let myNotifications = [];
+    let unsubscribeNotifs = null;
+
     let currentTab = "home";
+    let selectedCategory = "Todo";
     let authMode = "login";
     let compressedPostImg = "";
     let compressedStoryImg = "";
     let pendingDeleteId = null;
     let savedIds = JSON.parse(localStorage.getItem("ec_saved_posts") || "[]");
+    let deepLinkPostId = new URLSearchParams(window.location.search).get("post");
+    let deepLinkHandled = false;
 
-    // Estado comentarios
+    // Estado comentarios y compartir
     let activeCommentPostId = null;
     let unsubscribeComments = null;
+    let activeShareData = null;
 
     // Estado visor historias
-    let storyGroups = []; // [{ uid, author, items: [...] }]
+    let storyGroups = [];
     let currentGroupIdx = 0;
     let currentStoryIdx = 0;
     let storyTimer = null;
 
     // Referencias DOM
+    const mainScroll = document.getElementById("main-scroll");
     const feedContainer = document.getElementById("feed-container");
     const feedLoading = document.getElementById("feed-loading");
     const feedEmpty = document.getElementById("feed-empty");
     const storiesSection = document.getElementById("stories-section");
     const storiesContainer = document.getElementById("stories-container");
+    const categoriesSection = document.getElementById("categories-section");
+    const categoriesContainer = document.getElementById("categories-container");
     const guestBanner = document.getElementById("guest-banner");
     const authStatusDot = document.getElementById("auth-status-dot");
     const headerAvatarWrap = document.getElementById("header-avatar-wrap");
+
+    const btnNotifications = document.getElementById("btn-notifications");
+    const notifBadge = document.getElementById("notif-badge");
 
     const viewFeed = document.getElementById("view-feed");
     const viewProfile = document.getElementById("view-profile");
@@ -562,100 +695,16 @@
     const modalPost = document.getElementById("modal-post");
     const modalStoryUpload = document.getElementById("modal-story-upload");
     const modalComments = document.getElementById("modal-comments");
-    const modalDelete = document.getElementById("modal-delete");
+    const modalPublicProfile = document.getElementById("modal-public-profile");
+    const modalNotifications = document.getElementById("modal-notifications");
     const modalShare = document.getElementById("modal-share");
-    let activeShareData = null;
-
-    function copyTextFallback(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text).catch(() => legacyCopy(text));
-      }
-      return legacyCopy(text);
-    }
-
-    function legacyCopy(text) {
-      return new Promise((resolve, reject) => {
-        try {
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.focus();
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }
-
-    function openShareModal(post, authorName) {
-      const shareUrl = window.location.href;
-      const caption = (post.caption || "").trim();
-      const message = caption
-        ? `Mirá esta publicación de ${authorName} en Estemos Comunicados: "${caption}"`
-        : `Mirá esta publicación de ${authorName} en Estemos Comunicados`;
-
-      activeShareData = { title: "Estemos Comunicados", text: message, url: shareUrl };
-      document.getElementById("share-preview-text").textContent = message;
-
-      const nativeBtn = document.getElementById("btn-share-native");
-      if (navigator.share) {
-        nativeBtn.classList.remove("hidden");
-        nativeBtn.classList.add("flex");
-      } else {
-        nativeBtn.classList.add("hidden");
-        nativeBtn.classList.remove("flex");
-      }
-
-      modalShare.classList.remove("hidden");
-    }
-
-    function closeShareModal() {
-      modalShare.classList.add("hidden");
-    }
-
-    document.getElementById("close-share-modal").addEventListener("click", closeShareModal);
-    modalShare.addEventListener("click", (e) => {
-      if (e.target === modalShare) closeShareModal();
-    });
-
-    document.getElementById("btn-share-whatsapp").addEventListener("click", () => {
-      if (!activeShareData) return;
-      const waText = encodeURIComponent(`${activeShareData.text}
-${activeShareData.url}`);
-      window.open(`https://wa.me/?text=${waText}`, "_blank", "noopener,noreferrer");
-      closeShareModal();
-    });
-
-    document.getElementById("btn-share-copy").addEventListener("click", async () => {
-      if (!activeShareData) return;
-      try {
-        await copyTextFallback(activeShareData.url);
-        showToast("¡Enlace copiado al portapapeles!");
-      } catch {
-        showToast("No se pudo copiar el enlace");
-      }
-      closeShareModal();
-    });
-
-    document.getElementById("btn-share-native").addEventListener("click", async () => {
-      if (!activeShareData) return;
-      try {
-        await navigator.share(activeShareData);
-        closeShareModal();
-      } catch (err) {
-        if (err && err.name === "AbortError") return;
-        await copyTextFallback(activeShareData.url).catch(() => {});
-        showToast("Enlace copiado al portapapeles");
-        closeShareModal();
-      }
-    });
+    const modalDelete = document.getElementById("modal-delete");
     const storyViewer = document.getElementById("story-viewer");
     const toastEl = document.getElementById("toast");
+
+    function isAdmin() {
+      return !!(currentUser && ADMIN_EMAILS.includes((currentUser.email || "").toLowerCase()));
+    }
 
     // --- TEMA CLARO / OSCURO ---
     const themeIcon = document.getElementById("theme-icon");
@@ -751,10 +800,139 @@ ${activeShareData.url}`);
         "auth/user-not-found": "No existe una cuenta con ese correo.",
         "auth/wrong-password": "Contraseña incorrecta.",
         "auth/too-many-requests": "Demasiados intentos. Esperá un momento y volvé a probar.",
+        "auth/popup-closed-by-user": "Se cerró la ventana de Google antes de terminar.",
+        "auth/operation-not-allowed": "Falta activar el proveedor Google en Firebase Console → Authentication → Sign-in method.",
         "auth/unauthorized-domain": "Falta autorizar este dominio en Firebase Console → Authentication → Settings."
       };
       return map[code] || "Ocurrió un error al autenticar. Revisá los datos e intentá nuevamente.";
     }
+
+    // --- SALTAR A UN POST ESPECÍFICO (Enlaces directos, Perfil, Notificaciones) ---
+    function jumpToPost(postId) {
+      selectedCategory = "Todo";
+      renderCategoriesBar();
+      switchTab("home");
+      setTimeout(() => {
+        const el = feedContainer.querySelector(`article[data-post-id="${postId}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.classList.remove("animate-post-highlight");
+          void el.offsetWidth;
+          el.classList.add("animate-post-highlight");
+        } else {
+          showToast("La publicación ya no está disponible");
+        }
+      }, 120);
+    }
+
+    // --- COMPARTIR (WhatsApp + Copiar enlace directo + Nativo) ---
+    function copyTextFallback(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(() => legacyCopy(text));
+      }
+      return legacyCopy(text);
+    }
+
+    function legacyCopy(text) {
+      return new Promise((resolve, reject) => {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function openShareModal(post, authorName) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?post=${post.id}`;
+      const caption = (post.caption || "").trim();
+      const message = caption
+        ? `Mirá esta publicación de ${authorName} en Estemos Comunicados: "${caption}"`
+        : `Mirá esta publicación de ${authorName} en Estemos Comunicados`;
+
+      activeShareData = { title: "Estemos Comunicados", text: message, url: shareUrl };
+      document.getElementById("share-preview-text").textContent = message;
+
+      const nativeBtn = document.getElementById("btn-share-native");
+      if (navigator.share) {
+        nativeBtn.classList.remove("hidden");
+        nativeBtn.classList.add("flex");
+      } else {
+        nativeBtn.classList.add("hidden");
+        nativeBtn.classList.remove("flex");
+      }
+
+      modalShare.classList.remove("hidden");
+    }
+
+    function closeShareModal() {
+      modalShare.classList.add("hidden");
+    }
+
+    document.getElementById("close-share-modal").addEventListener("click", closeShareModal);
+    modalShare.addEventListener("click", (e) => { if (e.target === modalShare) closeShareModal(); });
+
+    document.getElementById("btn-share-whatsapp").addEventListener("click", () => {
+      if (!activeShareData) return;
+      const waText = encodeURIComponent(`${activeShareData.text}\n${activeShareData.url}`);
+      window.open(`https://wa.me/?text=${waText}`, "_blank", "noopener,noreferrer");
+      closeShareModal();
+    });
+
+    document.getElementById("btn-share-copy").addEventListener("click", async () => {
+      if (!activeShareData) return;
+      try {
+        await copyTextFallback(activeShareData.url);
+        showToast("¡Enlace directo copiado!");
+      } catch {
+        showToast("No se pudo copiar el enlace");
+      }
+      closeShareModal();
+    });
+
+    document.getElementById("btn-share-native").addEventListener("click", async () => {
+      if (!activeShareData) return;
+      try {
+        await navigator.share(activeShareData);
+        closeShareModal();
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+        await copyTextFallback(activeShareData.url).catch(() => {});
+        showToast("Enlace directo copiado");
+        closeShareModal();
+      }
+    });
+
+    // --- CATEGORÍAS RÁPIDAS ---
+    function renderCategoriesBar() {
+      categoriesContainer.innerHTML = "";
+      CATEGORIES.forEach((cat) => {
+        const active = selectedCategory === cat;
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition active:scale-95 ${
+          active
+            ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xs"
+            : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700"
+        }`;
+        btn.textContent = cat;
+        btn.addEventListener("click", () => {
+          selectedCategory = cat;
+          renderCategoriesBar();
+          renderFeed();
+        });
+        categoriesContainer.appendChild(btn);
+      });
+    }
+    renderCategoriesBar();
 
     // --- NAVEGACIÓN ---
     function switchTab(tab) {
@@ -779,6 +957,7 @@ ${activeShareData.url}`);
       viewProfile.classList.toggle("hidden", tab !== "profile");
       viewFeed.classList.toggle("hidden", tab === "profile");
       storiesSection.classList.toggle("hidden", tab !== "home");
+      categoriesSection.classList.toggle("hidden", tab !== "home");
 
       if (tab === "search") searchInput.focus();
       if (tab === "profile") renderProfile();
@@ -788,16 +967,23 @@ ${activeShareData.url}`);
     document.querySelectorAll(".nav-btn").forEach((btn) => {
       btn.addEventListener("click", () => switchTab(btn.dataset.nav));
     });
-    document.getElementById("logo-home-btn").addEventListener("click", () => switchTab("home"));
+    document.getElementById("logo-home-btn").addEventListener("click", () => {
+      selectedCategory = "Todo";
+      renderCategoriesBar();
+      switchTab("home");
+      mainScroll.scrollTo({ top: 0, behavior: "smooth" });
+    });
 
-    // --- AUTENTICACIÓN ---
+    // --- AUTENTICACIÓN (Google + Email + Reset) ---
     function setAuthMode(mode) {
       authMode = mode;
       const isReg = mode === "register";
       document.getElementById("auth-modal-title").textContent = isReg ? "Crear cuenta" : "Iniciar sesión";
       document.getElementById("auth-submit-btn").textContent = isReg ? "Registrarme" : "Entrar";
       document.getElementById("auth-name-wrap").classList.toggle("hidden", !isReg);
+      document.getElementById("btn-forgot-pass").classList.toggle("hidden", isReg);
       document.getElementById("auth-error").classList.add("hidden");
+      document.getElementById("auth-success").classList.add("hidden");
 
       const tabLogin = document.getElementById("tab-login");
       const tabReg = document.getElementById("tab-register");
@@ -813,11 +999,60 @@ ${activeShareData.url}`);
     document.getElementById("tab-login").addEventListener("click", () => setAuthMode("login"));
     document.getElementById("tab-register").addEventListener("click", () => setAuthMode("register"));
     document.getElementById("close-auth-modal").addEventListener("click", () => modalAuth.classList.add("hidden"));
-    document.getElementById("btn-banner-login").addEventListener("click", () => openAuthModal("register"));
+    document.getElementById("btn-banner-login").addEventListener("click", () => openAuthModal("login"));
     document.getElementById("btn-profile-open-auth").addEventListener("click", () => openAuthModal("login"));
     document.getElementById("btn-open-auth-header").addEventListener("click", () => {
       if (currentUser) switchTab("profile");
       else openAuthModal("login");
+    });
+
+    // Continuar con Google
+    document.getElementById("btn-google-login").addEventListener("click", async () => {
+      const errEl = document.getElementById("auth-error");
+      const okEl = document.getElementById("auth-success");
+      errEl.classList.add("hidden");
+      okEl.classList.add("hidden");
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const u = result.user;
+        const existing = usersMap[u.uid];
+        await setDoc(doc(db, "users", u.uid), {
+          displayName: (existing && existing.displayName) || u.displayName || u.email.split("@")[0],
+          photoURL: (existing && existing.photoURL) || u.photoURL || "",
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        modalAuth.classList.add("hidden");
+        showToast("¡Bienvenido a Estemos Comunicados!");
+      } catch (err) {
+        errEl.textContent = translateAuthError(err.code);
+        errEl.classList.remove("hidden");
+      }
+    });
+
+    // Recuperar contraseña
+    document.getElementById("btn-forgot-pass").addEventListener("click", async () => {
+      const emailInput = document.getElementById("auth-email");
+      const email = emailInput.value.trim();
+      const errEl = document.getElementById("auth-error");
+      const okEl = document.getElementById("auth-success");
+      errEl.classList.add("hidden");
+      okEl.classList.add("hidden");
+
+      if (!email) {
+        errEl.textContent = "Escribí tu correo electrónico arriba y volvé a tocar este botón.";
+        errEl.classList.remove("hidden");
+        emailInput.focus();
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        okEl.textContent = `Te enviamos un enlace a ${email} para restablecer tu contraseña. Revisá también la carpeta de Spam.`;
+        okEl.classList.remove("hidden");
+      } catch (err) {
+        errEl.textContent = translateAuthError(err.code);
+        errEl.classList.remove("hidden");
+      }
     });
 
     document.getElementById("auth-form").addEventListener("submit", async (e) => {
@@ -826,9 +1061,11 @@ ${activeShareData.url}`);
       const email = document.getElementById("auth-email").value.trim();
       const pass = document.getElementById("auth-pass").value;
       const errEl = document.getElementById("auth-error");
+      const okEl = document.getElementById("auth-success");
       const submitBtn = document.getElementById("auth-submit-btn");
 
       errEl.classList.add("hidden");
+      okEl.classList.add("hidden");
       submitBtn.disabled = true;
       submitBtn.textContent = "Procesando...";
 
@@ -881,17 +1118,123 @@ ${activeShareData.url}`);
       }
     }
 
+    // --- NOTIFICACIONES EN TIEMPO REAL ---
+    async function sendNotification(toUid, type, postId, extraText = "") {
+      if (!currentUser || !toUid || toUid === currentUser.uid) return;
+      try {
+        const fromInfo = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+        await addDoc(collection(db, "notifications"), {
+          toUid,
+          fromUid: currentUser.uid,
+          fromName: fromInfo.name,
+          type,
+          postId,
+          text: extraText,
+          read: false,
+          createdAt: serverTimestamp()
+        });
+      } catch (err) {
+        console.error("Notif error:", err);
+      }
+    }
+
+    function listenNotifications(uid) {
+      if (unsubscribeNotifs) {
+        unsubscribeNotifs();
+        unsubscribeNotifs = null;
+      }
+      if (!uid) {
+        myNotifications = [];
+        btnNotifications.classList.add("hidden");
+        notifBadge.classList.add("hidden");
+        return;
+      }
+      btnNotifications.classList.remove("hidden");
+      const q = query(collection(db, "notifications"), where("toUid", "==", uid));
+      unsubscribeNotifs = onSnapshot(q, (snap) => {
+        myNotifications = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => {
+            const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : Date.now();
+            const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : Date.now();
+            return tb - ta;
+          })
+          .slice(0, 40);
+
+        const unread = myNotifications.filter((n) => !n.read).length;
+        if (unread > 0) {
+          notifBadge.textContent = unread > 9 ? "9+" : String(unread);
+          notifBadge.classList.remove("hidden");
+        } else {
+          notifBadge.classList.add("hidden");
+        }
+        if (!modalNotifications.classList.contains("hidden")) {
+          renderNotificationsList();
+        }
+      }, (err) => console.error("Error notifications:", err));
+    }
+
+    function renderNotificationsList() {
+      const listEl = document.getElementById("notifications-list");
+      listEl.innerHTML = "";
+      if (myNotifications.length === 0) {
+        listEl.innerHTML = '<div class="py-12 px-6 text-center text-xs text-gray-400">Todavía no tenés notificaciones. Cuando alguien comente o le dé Me gusta a tus fotos, te avisamos acá.</div>';
+        return;
+      }
+      myNotifications.forEach((n) => {
+        const fromInfo = getUserDisplay(n.fromUid, n.fromName);
+        const btn = document.createElement("button");
+        btn.className = `w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition ${!n.read ? "bg-pink-50/50 dark:bg-pink-950/20" : ""}`;
+        btn.innerHTML = `
+          <div class="n-avatar w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs text-gray-800 dark:text-gray-200 leading-snug">
+              <span class="font-semibold text-gray-900 dark:text-white n-from"></span>
+              <span class="n-msg"></span>
+            </p>
+            <p class="text-[10px] text-gray-400 mt-0.5">${timeAgo(n.createdAt)}</p>
+          </div>
+          <i class="${n.type === "like" ? "ph-fill ph-heart text-red-500" : "ph-fill ph-chat-circle text-pink-500"} text-lg shrink-0"></i>
+        `;
+        renderAvatarContent(btn.querySelector(".n-avatar"), fromInfo.photoURL, fromInfo.name);
+        btn.querySelector(".n-from").textContent = fromInfo.name + " ";
+        btn.querySelector(".n-msg").textContent = n.type === "like"
+          ? "le dio Me gusta a tu publicación."
+          : `comentó: "${(n.text || "").slice(0, 60)}"`;
+
+        btn.addEventListener("click", () => {
+          modalNotifications.classList.add("hidden");
+          if (n.postId) jumpToPost(n.postId);
+        });
+        listEl.appendChild(btn);
+      });
+    }
+
+    btnNotifications.addEventListener("click", () => {
+      modalNotifications.classList.remove("hidden");
+      renderNotificationsList();
+      // Marcar todas como leídas
+      myNotifications.filter((n) => !n.read).forEach((n) => {
+        updateDoc(doc(db, "notifications", n.id), { read: true }).catch(() => {});
+      });
+    });
+
+    document.getElementById("close-notifications").addEventListener("click", () => {
+      modalNotifications.classList.add("hidden");
+    });
+
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       guestBanner.classList.toggle("hidden", !!user);
       authStatusDot.classList.toggle("hidden", !user);
       updateHeaderAvatar();
+      listenNotifications(user ? user.uid : null);
       renderStoriesBar();
       renderFeed();
       if (currentTab === "profile") renderProfile();
     });
 
-    // --- PERFIL Y FOTO EDITABLE ---
+    // --- PERFIL PROPIO Y FOTO EDITABLE ---
     document.getElementById("avatar-file-input").addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file || !currentUser) return;
@@ -943,6 +1286,7 @@ ${activeShareData.url}`);
       renderAvatarContent(document.getElementById("profile-avatar-inner"), info.photoURL, info.name);
       document.getElementById("profile-name").textContent = info.name;
       document.getElementById("profile-email").textContent = currentUser.email;
+      document.getElementById("profile-admin-badge").classList.toggle("hidden", !isAdmin());
 
       const myPosts = allPosts.filter((p) => p.uid === currentUser.uid);
       const totalLikes = myPosts.reduce((acc, p) => acc + (Array.isArray(p.likedBy) ? p.likedBy.length : 0), 0);
@@ -955,16 +1299,60 @@ ${activeShareData.url}`);
       noPosts.classList.toggle("hidden", myPosts.length > 0);
 
       myPosts.forEach((p) => {
-        const cell = document.createElement("div");
+        const cell = document.createElement("button");
         cell.className = "aspect-square bg-gray-100 dark:bg-zinc-800 overflow-hidden relative";
         const img = document.createElement("img");
         img.src = p.imageUrl;
         img.className = "w-full h-full object-cover";
         img.alt = "Mi publicación";
         cell.appendChild(img);
+        cell.addEventListener("click", () => jumpToPost(p.id));
         grid.appendChild(cell);
       });
     }
+
+    // --- PERFIL PÚBLICO DE CUALQUIER USUARIO ---
+    function openPublicProfile(uid, fallbackName) {
+      if (currentUser && currentUser.uid === uid) {
+        switchTab("profile");
+        return;
+      }
+      const info = getUserDisplay(uid, fallbackName);
+      const userPosts = allPosts.filter((p) => p.uid === uid);
+      const totalLikes = userPosts.reduce((acc, p) => acc + (Array.isArray(p.likedBy) ? p.likedBy.length : 0), 0);
+
+      document.getElementById("pp-header-title").textContent = info.name;
+      document.getElementById("pp-name").textContent = info.name;
+      renderAvatarContent(document.getElementById("pp-avatar"), info.photoURL, info.name);
+      document.getElementById("pp-posts-count").textContent = userPosts.length;
+      document.getElementById("pp-likes-count").textContent = totalLikes;
+
+      const grid = document.getElementById("pp-grid");
+      const empty = document.getElementById("pp-empty");
+      grid.innerHTML = "";
+      empty.classList.toggle("hidden", userPosts.length > 0);
+
+      userPosts.forEach((p) => {
+        const cell = document.createElement("button");
+        cell.className = "aspect-square bg-gray-100 dark:bg-zinc-800 overflow-hidden relative";
+        const img = document.createElement("img");
+        img.src = p.imageUrl;
+        img.className = "w-full h-full object-cover";
+        img.alt = "Publicación";
+        cell.appendChild(img);
+        cell.addEventListener("click", () => {
+          modalPublicProfile.classList.add("hidden");
+          jumpToPost(p.id);
+        });
+        grid.appendChild(cell);
+      });
+
+      modalPublicProfile.classList.remove("hidden");
+    }
+
+    document.getElementById("close-public-profile").addEventListener("click", () => {
+      modalPublicProfile.classList.add("hidden");
+    });
 
     // --- HISTORIAS REALES (24 HORAS) ---
     function openUploadStory() {
@@ -1042,7 +1430,6 @@ ${activeShareData.url}`);
       const now = Date.now();
       const valid = activeStories.filter((s) => !s.expiresAt || s.expiresAt > now);
       const map = new Map();
-      // Orden cronológico para ver primero la más vieja de cada usuario
       [...valid].reverse().forEach((s) => {
         if (!map.has(s.uid)) {
           map.set(s.uid, { uid: s.uid, author: s.author, items: [] });
@@ -1056,7 +1443,6 @@ ${activeShareData.url}`);
       buildStoryGroups();
       storiesContainer.innerHTML = "";
 
-      // Botón "Tu historia" (siempre primero)
       const myBtn = document.createElement("button");
       myBtn.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
       const myInfo = currentUser ? getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]) : { name: "+", photoURL: "" };
@@ -1073,7 +1459,6 @@ ${activeShareData.url}`);
       myBtn.addEventListener("click", openUploadStory);
       storiesContainer.appendChild(myBtn);
 
-      // Historias activas de la comunidad
       storyGroups.forEach((group, gIdx) => {
         const info = getUserDisplay(group.uid, group.author);
         const btn = document.createElement("button");
@@ -1114,7 +1499,6 @@ ${activeShareData.url}`);
       const item = group.items[currentStoryIdx];
       const info = getUserDisplay(item.uid, item.author);
 
-      // Barras de progreso
       const barsEl = document.getElementById("story-progress-bars");
       barsEl.innerHTML = "";
       group.items.forEach((_, idx) => {
@@ -1141,6 +1525,11 @@ ${activeShareData.url}`);
       document.getElementById("sv-time").textContent = timeAgo(item.createdAt);
       document.getElementById("sv-image").src = item.imageUrl;
 
+      document.getElementById("sv-author-btn").onclick = () => {
+        closeStoryViewer();
+        openPublicProfile(item.uid, item.author);
+      };
+
       const capWrap = document.getElementById("sv-caption-wrap");
       if (item.caption) {
         document.getElementById("sv-caption").textContent = item.caption;
@@ -1150,8 +1539,8 @@ ${activeShareData.url}`);
       }
 
       const delBtn = document.getElementById("sv-delete-btn");
-      const isOwner = currentUser && currentUser.uid === item.uid;
-      delBtn.classList.toggle("hidden", !isOwner);
+      const canDelete = (currentUser && currentUser.uid === item.uid) || isAdmin();
+      delBtn.classList.toggle("hidden", !canDelete);
       delBtn.onclick = async () => {
         clearTimeout(storyTimer);
         if (!confirm("¿Eliminar esta historia?")) {
@@ -1238,6 +1627,7 @@ ${activeShareData.url}`);
       if (!currentUser) return openAuthModal("login");
 
       const urlVal = document.getElementById("post-url").value.trim();
+      const categoryVal = document.getElementById("post-category").value;
       const locationVal = document.getElementById("post-location").value.trim();
       const captionVal = document.getElementById("post-caption").value.trim();
       const imageFinal = compressedPostImg || urlVal;
@@ -1260,6 +1650,7 @@ ${activeShareData.url}`);
           uid: currentUser.uid,
           author: info.name,
           imageUrl: imageFinal,
+          category: categoryVal,
           location: locationVal,
           caption: captionVal,
           likedBy: [],
@@ -1273,6 +1664,8 @@ ${activeShareData.url}`);
         postFilePlaceholder.classList.remove("hidden");
         modalPost.classList.add("hidden");
         showToast("¡Publicado con éxito!");
+        selectedCategory = "Todo";
+        renderCategoriesBar();
         switchTab("home");
       } catch (err) {
         console.error(err);
@@ -1297,6 +1690,9 @@ ${activeShareData.url}`);
         await updateDoc(doc(db, "posts", post.id), {
           likedBy: alreadyLiked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
         });
+        if (!alreadyLiked) {
+          sendNotification(post.uid, "like", post.id);
+        }
       } catch {
         showToast("No se pudo actualizar el Me gusta");
       }
@@ -1332,24 +1728,31 @@ ${activeShareData.url}`);
         snap.forEach((docSnap) => {
           const c = { id: docSnap.id, ...docSnap.data() };
           const info = getUserDisplay(c.uid, c.author);
-          const isOwner = currentUser && currentUser.uid === c.uid;
+          const canDelete = (currentUser && currentUser.uid === c.uid) || isAdmin();
 
           const row = document.createElement("div");
           row.className = "flex items-start gap-2.5";
           row.innerHTML = `
-            <div class="c-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
+            <button class="c-profile-btn c-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></button>
             <div class="flex-1 min-w-0">
               <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug break-words">
-                <span class="font-semibold text-gray-900 dark:text-white mr-1.5 c-author"></span>
+                <button class="c-profile-btn font-semibold text-gray-900 dark:text-white mr-1.5 hover:underline c-author"></button>
                 <span class="c-text"></span>
               </p>
               <p class="text-[10px] text-gray-400 mt-0.5">${timeAgo(c.createdAt)}</p>
             </div>
-            ${isOwner ? '<button class="c-del text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-sm"></i></button>' : ""}
+            ${canDelete ? '<button class="c-del text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-sm"></i></button>' : ""}
           `;
           renderAvatarContent(row.querySelector(".c-avatar"), info.photoURL, info.name);
           row.querySelector(".c-author").textContent = info.name;
           row.querySelector(".c-text").textContent = c.text || "";
+
+          row.querySelectorAll(".c-profile-btn").forEach((b) => {
+            b.addEventListener("click", () => {
+              closeComments();
+              openPublicProfile(c.uid, c.author);
+            });
+          });
 
           const delBtn = row.querySelector(".c-del");
           if (delBtn) {
@@ -1407,6 +1810,11 @@ ${activeShareData.url}`);
         await updateDoc(doc(db, "posts", activeCommentPostId), {
           commentsCount: increment(1)
         }).catch(() => {});
+
+        const targetPost = allPosts.find((p) => p.id === activeCommentPostId);
+        if (targetPost) {
+          sendNotification(targetPost.uid, "comment", activeCommentPostId, text);
+        }
         input.value = "";
       } catch (err) {
         console.error(err);
@@ -1459,13 +1867,20 @@ ${activeShareData.url}`);
           const info = getUserDisplay(p.uid, p.author);
           return info.name.toLowerCase().includes(q) ||
             (p.location || "").toLowerCase().includes(q) ||
+            (p.category || "Comunidad").toLowerCase().includes(q) ||
             (p.caption || "").toLowerCase().includes(q);
         });
         document.getElementById("feed-empty-title").textContent = "Sin resultados";
-        document.getElementById("feed-empty-sub").textContent = "Probá buscando otro nombre, lugar o palabra.";
+        document.getElementById("feed-empty-sub").textContent = "Probá buscando otro nombre, lugar, categoría o palabra.";
       } else {
-        document.getElementById("feed-empty-title").textContent = "Todavía no hay publicaciones";
-        document.getElementById("feed-empty-sub").innerHTML = 'Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.';
+        if (currentTab === "home" && selectedCategory !== "Todo") {
+          list = list.filter((p) => (p.category || "Comunidad") === selectedCategory);
+          document.getElementById("feed-empty-title").textContent = `Sin publicaciones en ${selectedCategory}`;
+          document.getElementById("feed-empty-sub").textContent = "Sé el primero en compartir algo en esta categoría.";
+        } else {
+          document.getElementById("feed-empty-title").textContent = "Todavía no hay publicaciones";
+          document.getElementById("feed-empty-sub").innerHTML = 'Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.';
+        }
       }
 
       feedContainer.innerHTML = "";
@@ -1475,23 +1890,28 @@ ${activeShareData.url}`);
         const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
         const isLiked = currentUser && likedBy.includes(currentUser.uid);
         const isSaved = savedIds.includes(post.id);
-        const isOwner = currentUser && currentUser.uid === post.uid;
+        const canDelete = (currentUser && currentUser.uid === post.uid) || isAdmin();
         const info = getUserDisplay(post.uid, post.author);
         const cCount = Math.max(0, post.commentsCount || 0);
+        const catLabel = post.category || "Comunidad";
 
         const article = document.createElement("article");
-        article.className = "bg-white dark:bg-zinc-900 pb-4";
+        article.className = "bg-white dark:bg-zinc-900 pb-4 transition-shadow";
+        article.dataset.postId = post.id;
 
         article.innerHTML = `
-          <div class="flex items-center justify-between px-3 py-2.5">
-            <div class="flex items-center gap-2.5 min-w-0">
+          <div class="flex items-center justify-between px-3 py-2.5 gap-2">
+            <button class="open-profile-btn flex items-center gap-2.5 min-w-0 text-left">
               <div class="post-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
               <div class="min-w-0">
-                <p class="font-semibold text-sm text-gray-900 dark:text-white leading-tight truncate author-name"></p>
+                <p class="font-semibold text-sm text-gray-900 dark:text-white leading-tight truncate author-name hover:underline"></p>
                 <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate post-loc"></p>
               </div>
+            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 post-cat"></span>
+              ${canDelete ? '<button class="delete-btn text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-lg"></i></button>' : ""}
             </div>
-            ${isOwner ? '<button class="delete-btn text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-lg"></i></button>' : ""}
           </div>
 
           <div class="relative bg-gray-100 dark:bg-zinc-800 select-none overflow-hidden img-wrap">
@@ -1521,7 +1941,7 @@ ${activeShareData.url}`);
           <div class="px-3 pt-1.5 space-y-1">
             <p class="text-xs font-semibold text-gray-900 dark:text-white">${likedBy.length} Me gusta</p>
             <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug">
-              <span class="font-semibold text-gray-900 dark:text-white mr-1 author-cap"></span>
+              <button class="open-profile-btn font-semibold text-gray-900 dark:text-white mr-1 hover:underline author-cap"></button>
               <span class="post-cap"></span>
             </p>
             <button class="view-comments-btn text-xs text-gray-500 dark:text-gray-400 hover:underline block">
@@ -1533,12 +1953,18 @@ ${activeShareData.url}`);
 
         renderAvatarContent(article.querySelector(".post-avatar"), info.photoURL, info.name);
         article.querySelector(".author-name").textContent = info.name;
+        article.querySelector(".post-cat").textContent = catLabel;
+
         const locEl = article.querySelector(".post-loc");
         if (post.location) locEl.textContent = post.location;
         else locEl.classList.add("hidden");
 
         article.querySelector(".author-cap").textContent = info.name;
         article.querySelector(".post-cap").textContent = post.caption || "";
+
+        article.querySelectorAll(".open-profile-btn").forEach((b) => {
+          b.addEventListener("click", () => openPublicProfile(post.uid, post.author));
+        });
 
         const imgEl = article.querySelector(".post-img");
         imgEl.src = post.imageUrl;
@@ -1587,7 +2013,6 @@ ${activeShareData.url}`);
     }
 
     // --- LISTENERS EN TIEMPO REAL ---
-    // 1. Perfiles de usuarios (para avatares actualizados en toda la app)
     onSnapshot(collection(db, "users"), (snap) => {
       const nextMap = {};
       snap.forEach((d) => { nextMap[d.id] = d.data(); });
@@ -1598,18 +2023,21 @@ ${activeShareData.url}`);
       if (currentTab === "profile") renderProfile();
     }, (err) => console.error("Error users:", err));
 
-    // 2. Historias activas
     onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc")), (snap) => {
       activeStories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       renderStoriesBar();
     }, (err) => console.error("Error stories:", err));
 
-    // 3. Publicaciones
     onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
       feedLoading.classList.add("hidden");
       allPosts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       renderFeed();
       if (currentTab === "profile") renderProfile();
+
+      if (deepLinkPostId && !deepLinkHandled) {
+        deepLinkHandled = true;
+        jumpToPost(deepLinkPostId);
+      }
     }, (err) => {
       feedLoading.classList.add("hidden");
       showToast("Error conectando con Firestore");
