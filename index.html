@@ -7,7 +7,7 @@
 
   <!-- PWA Config -->
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Comunicados" />
@@ -16,6 +16,11 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -58,38 +63,46 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 md:py-6 flex justify-center min-h-[100dvh]">
+<body class="bg-gray-100 dark:bg-zinc-950 md:py-6 flex justify-center min-h-[100dvh] transition-colors">
 
   <!-- App Container -->
-  <div class="w-full max-w-md bg-white h-[100dvh] md:h-[90dvh] md:rounded-3xl md:shadow-2xl md:border md:border-gray-200 flex flex-col overflow-hidden relative">
+  <div class="w-full max-w-md bg-white dark:bg-zinc-900 h-[100dvh] md:h-[90dvh] md:rounded-3xl md:shadow-2xl md:border md:border-gray-200 dark:md:border-zinc-800 flex flex-col overflow-hidden relative transition-colors">
 
     <!-- Header -->
-    <header class="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between shrink-0 z-20">
-      <button id="logo-home-btn" class="font-logo text-[28px] sm:text-[32px] leading-none text-gray-900 tracking-wide select-none">
+    <header class="px-4 py-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0 z-20">
+      <button id="logo-home-btn" class="font-logo text-[26px] sm:text-[30px] leading-none text-gray-900 dark:text-white tracking-wide select-none">
         Estemos Comunicados
       </button>
 
-      <div class="flex items-center gap-2.5">
-        <!-- Botón Instalar PWA (se muestra solo si es instalable) -->
+      <div class="flex items-center gap-2">
+        <!-- Botón Instalar PWA -->
         <button id="btn-install-pwa"
                 class="hidden items-center gap-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-semibold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
           <i class="ph ph-download-simple text-sm"></i>
           <span>Instalar</span>
         </button>
 
-        <button id="btn-open-auth-header" class="text-gray-800 hover:text-black active:scale-90 transition relative" title="Cuenta">
-          <i class="ph ph-user-circle text-2xl"></i>
-          <span id="auth-status-dot" class="hidden w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full absolute -top-0.5 -right-0.5"></span>
+        <!-- Botón Modo Oscuro -->
+        <button id="btn-theme-toggle" class="text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white p-1 active:scale-90 transition" title="Cambiar tema">
+          <i id="theme-icon" class="ph ph-moon text-xl"></i>
+        </button>
+
+        <!-- Acceso Cuenta / Perfil -->
+        <button id="btn-open-auth-header" class="text-gray-800 dark:text-gray-200 hover:text-black dark:hover:text-white active:scale-90 transition relative" title="Cuenta">
+          <div id="header-avatar-wrap" class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+            <i class="ph ph-user-circle text-2xl"></i>
+          </div>
+          <span id="auth-status-dot" class="hidden w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full absolute -top-0.5 -right-0.5"></span>
         </button>
       </div>
     </header>
 
-    <!-- Barra de búsqueda (visible cuando se activa pestaña Buscar) -->
-    <div id="search-bar-wrap" class="hidden px-4 py-2.5 bg-white border-b border-gray-100 shrink-0">
+    <!-- Barra de búsqueda -->
+    <div id="search-bar-wrap" class="hidden px-4 py-2.5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
       <div class="relative">
         <i class="ph ph-magnifying-glass text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-lg"></i>
         <input id="search-input" type="text" placeholder="Buscar por usuario, lugar o texto..."
-               class="w-full bg-gray-100 rounded-xl pl-9 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+               class="w-full bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 rounded-xl pl-9 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
         <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
           <i class="ph-fill ph-x-circle text-lg"></i>
         </button>
@@ -97,24 +110,22 @@
     </div>
 
     <!-- Main Scrollable Content -->
-    <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar bg-white">
+    <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar bg-white dark:bg-zinc-900">
 
       <!-- Vista Feed / Inicio -->
       <div id="view-feed">
-        <!-- Stories -->
-        <section id="stories-section" class="border-b border-gray-100 py-3 px-3">
-          <div class="flex gap-3.5 overflow-x-auto no-scrollbar" id="stories-container">
-            <!-- Se llena por JS -->
-          </div>
+        <!-- Historias Reales 24hs -->
+        <section id="stories-section" class="border-b border-gray-100 dark:border-zinc-800 py-3 px-3">
+          <div class="flex gap-3.5 overflow-x-auto no-scrollbar" id="stories-container"></div>
         </section>
 
-        <!-- Banner invitación a registrarse (se oculta si está logueado) -->
-        <div id="guest-banner" class="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 flex items-center justify-between gap-2">
-          <div class="text-xs text-gray-700">
-            <p class="font-semibold text-gray-900">¡Sumate a la comunidad!</p>
-            <p>Creá tu cuenta para publicar fotos y dar Me gusta.</p>
+        <!-- Banner invitación -->
+        <div id="guest-banner" class="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/40 dark:to-purple-950/40 border border-pink-100 dark:border-pink-900/50 flex items-center justify-between gap-2">
+          <div class="text-xs text-gray-700 dark:text-gray-300">
+            <p class="font-semibold text-gray-900 dark:text-white">¡Sumate a la comunidad!</p>
+            <p>Creá tu cuenta para publicar, comentar y subir historias.</p>
           </div>
-          <button id="btn-banner-login" class="shrink-0 bg-gray-900 text-white text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition">
+          <button id="btn-banner-login" class="shrink-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition">
             Ingresar
           </button>
         </div>
@@ -126,29 +137,29 @@
         </div>
 
         <!-- Feed vacío -->
-        <div id="feed-empty" class="hidden py-14 px-6 text-center text-gray-500">
-          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+        <div id="feed-empty" class="hidden py-14 px-6 text-center text-gray-500 dark:text-gray-400">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400">
             <i class="ph ph-camera text-3xl"></i>
           </div>
-          <p class="font-semibold text-gray-800 text-sm">Todavía no hay publicaciones</p>
-          <p class="text-xs mt-1">Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.</p>
+          <p id="feed-empty-title" class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Todavía no hay publicaciones</p>
+          <p id="feed-empty-sub" class="text-xs mt-1">Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.</p>
         </div>
 
         <!-- Lista de publicaciones -->
-        <section id="feed-container" class="divide-y divide-gray-100 pb-6"></section>
+        <section id="feed-container" class="divide-y divide-gray-100 dark:divide-zinc-800 pb-6"></section>
       </div>
 
       <!-- Vista Perfil -->
       <div id="view-profile" class="hidden p-4 pb-8">
         <div id="profile-logged-out" class="py-10 text-center space-y-4">
           <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-0.5">
-            <div class="w-full h-full bg-white rounded-full flex items-center justify-center">
+            <div class="w-full h-full bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center">
               <i class="ph ph-user text-4xl text-gray-400"></i>
             </div>
           </div>
           <div>
-            <h2 class="font-bold text-gray-900 text-lg">Tu perfil en Estemos Comunicados</h2>
-            <p class="text-xs text-gray-500 mt-1 px-4">Iniciá sesión o creá una cuenta para subir tus fotos y guardar tus publicaciones favoritas.</p>
+            <h2 class="font-bold text-gray-900 dark:text-white text-lg">Tu perfil en Estemos Comunicados</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 px-4">Iniciá sesión o creá una cuenta para subir fotos, historias y comentar.</p>
           </div>
           <button id="btn-profile-open-auth" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
             Iniciar sesión / Registrarse
@@ -157,29 +168,48 @@
 
         <div id="profile-logged-in" class="hidden space-y-5">
           <div class="flex items-center gap-4">
-            <div id="profile-avatar" class="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase shrink-0">
-              U
-            </div>
+            <!-- Avatar editable -->
+            <label class="relative cursor-pointer shrink-0 group" title="Cambiar foto de perfil">
+              <input id="avatar-file-input" type="file" accept="image/*" class="hidden" />
+              <div id="profile-avatar-box" class="w-18 h-18 w-[72px] h-[72px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2.5px]">
+                <div id="profile-avatar-inner" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase overflow-hidden border-2 border-white dark:border-zinc-900">
+                  U
+                </div>
+              </div>
+              <span class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-2 border-white dark:border-zinc-900 flex items-center justify-center shadow">
+                <i class="ph ph-camera text-xs"></i>
+              </span>
+            </label>
+
             <div class="flex-1 min-w-0">
-              <h2 id="profile-name" class="font-bold text-gray-900 text-base truncate">Usuario</h2>
-              <p id="profile-email" class="text-xs text-gray-500 truncate">usuario@correo.com</p>
+              <div class="flex items-center gap-1.5">
+                <h2 id="profile-name" class="font-bold text-gray-900 dark:text-white text-base truncate">Usuario</h2>
+                <button id="btn-edit-name" class="text-gray-400 hover:text-pink-500 p-0.5" title="Editar nombre">
+                  <i class="ph ph-pencil-simple text-sm"></i>
+                </button>
+              </div>
+              <p id="profile-email" class="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@correo.com</p>
               <div class="flex gap-4 mt-2 text-xs">
-                <div><span id="stat-posts" class="font-bold text-gray-900">0</span> <span class="text-gray-500">posts</span></div>
-                <div><span id="stat-likes" class="font-bold text-gray-900">0</span> <span class="text-gray-500">likes recibidos</span></div>
+                <div><span id="stat-posts" class="font-bold text-gray-900 dark:text-white">0</span> <span class="text-gray-500 dark:text-gray-400">posts</span></div>
+                <div><span id="stat-likes" class="font-bold text-gray-900 dark:text-white">0</span> <span class="text-gray-500 dark:text-gray-400">likes</span></div>
               </div>
             </div>
           </div>
 
           <div class="flex gap-2">
-            <button id="btn-profile-new-post" class="flex-1 bg-gray-900 text-white text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
-              + Nueva publicación
+            <button id="btn-profile-new-post" class="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
+              + Publicar foto
             </button>
-            <button id="btn-logout" class="px-4 bg-red-50 text-red-600 text-xs font-semibold py-2.5 rounded-xl hover:bg-red-100 active:scale-95 transition">
-              Cerrar sesión
+            <button id="btn-profile-new-story" class="flex-1 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
+              + Subir historia
             </button>
           </div>
 
-          <div class="border-t border-gray-100 pt-4">
+          <button id="btn-logout" class="w-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-semibold py-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-950/60 active:scale-95 transition">
+            Cerrar sesión
+          </button>
+
+          <div class="border-t border-gray-100 dark:border-zinc-800 pt-4">
             <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Mis publicaciones</h3>
             <div id="profile-posts-grid" class="grid grid-cols-3 gap-1"></div>
             <p id="profile-no-posts" class="hidden text-center text-xs text-gray-400 py-8">Aún no subiste ninguna foto.</p>
@@ -190,58 +220,57 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="bg-white border-t border-gray-100 px-6 py-2.5 flex items-center justify-between shrink-0 z-20">
-      <button data-nav="home" class="nav-btn text-gray-900 p-1 active:scale-90 transition" title="Inicio">
+    <nav class="bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 px-6 py-2.5 flex items-center justify-between shrink-0 z-20">
+      <button data-nav="home" class="nav-btn text-gray-900 dark:text-white p-1 active:scale-90 transition" title="Inicio">
         <i class="ph-fill ph-house text-2xl"></i>
       </button>
-      <button data-nav="search" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Buscar">
+      <button data-nav="search" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Buscar">
         <i class="ph ph-magnifying-glass text-2xl"></i>
       </button>
-      <button id="btn-nav-create" class="p-1 text-gray-800 hover:text-pink-600 active:scale-90 transition" title="Nueva publicación">
+      <button id="btn-nav-create" class="p-1 text-gray-800 dark:text-gray-200 hover:text-pink-600 active:scale-90 transition" title="Nueva publicación">
         <i class="ph ph-plus-square text-[26px]"></i>
       </button>
-      <button data-nav="saved" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Guardados">
+      <button data-nav="saved" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Guardados">
         <i class="ph ph-bookmark-simple text-2xl"></i>
       </button>
-      <button data-nav="profile" class="nav-btn text-gray-500 p-1 active:scale-90 transition" title="Perfil">
+      <button data-nav="profile" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Perfil">
         <i class="ph ph-user-circle text-2xl"></i>
       </button>
     </nav>
 
-    <!-- MODAL: Autenticación (Login / Registro) -->
-    <div id="modal-auth" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div class="bg-white w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl">
+    <!-- MODAL: Autenticación -->
+    <div id="modal-auth" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t dark:border-zinc-800">
         <div class="flex items-center justify-between">
-          <h3 id="auth-modal-title" class="font-bold text-gray-900 text-lg">Iniciar sesión</h3>
-          <button id="close-auth-modal" class="text-gray-400 hover:text-gray-700 p-1">
+          <h3 id="auth-modal-title" class="font-bold text-gray-900 dark:text-white text-lg">Iniciar sesión</h3>
+          <button id="close-auth-modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
             <i class="ph ph-x text-xl"></i>
           </button>
         </div>
 
-        <!-- Tabs Login / Registro -->
-        <div class="grid grid-cols-2 bg-gray-100 p-1 rounded-xl text-xs font-semibold">
-          <button id="tab-login" class="py-2 rounded-lg bg-white text-gray-900 shadow-xs transition">Iniciar sesión</button>
-          <button id="tab-register" class="py-2 rounded-lg text-gray-500 transition">Crear cuenta</button>
+        <div class="grid grid-cols-2 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl text-xs font-semibold">
+          <button id="tab-login" class="py-2 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-xs transition">Iniciar sesión</button>
+          <button id="tab-register" class="py-2 rounded-lg text-gray-500 dark:text-gray-400 transition">Crear cuenta</button>
         </div>
 
         <form id="auth-form" class="space-y-3">
           <div id="auth-name-wrap" class="hidden">
-            <label class="block text-xs font-medium text-gray-600 mb-1">Nombre y apellido</label>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Nombre y apellido</label>
             <input id="auth-name" type="text" placeholder="Ej: Juan Pérez"
-                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                   class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Correo electrónico</label>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Correo electrónico</label>
             <input id="auth-email" type="email" required placeholder="tu@correo.com"
-                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                   class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña</label>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Contraseña</label>
             <input id="auth-pass" type="password" required minlength="6" placeholder="Mínimo 6 caracteres"
-                   class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                   class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
 
-          <p id="auth-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+          <p id="auth-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2"></p>
 
           <button id="auth-submit-btn" type="submit"
                   class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
@@ -252,20 +281,19 @@
     </div>
 
     <!-- MODAL: Nueva Publicación -->
-    <div id="modal-post" class="hidden absolute inset-0 bg-black/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div class="bg-white w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-3.5 shadow-2xl max-h-[90dvh] overflow-y-auto">
+    <div id="modal-post" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-3.5 shadow-2xl max-h-[90dvh] overflow-y-auto border-t dark:border-zinc-800">
         <div class="flex items-center justify-between">
-          <h3 class="font-bold text-gray-900 text-lg">Nueva publicación</h3>
-          <button id="close-post-modal" class="text-gray-400 hover:text-gray-700 p-1">
+          <h3 class="font-bold text-gray-900 dark:text-white text-lg">Nueva publicación</h3>
+          <button id="close-post-modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
             <i class="ph ph-x text-xl"></i>
           </button>
         </div>
 
         <form id="post-form" class="space-y-3">
-          <!-- Selector de archivo -->
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Elegí una foto de tu celular o PC</label>
-            <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition bg-gray-50">
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Elegí una foto de tu celular o PC</label>
+            <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition bg-gray-50 dark:bg-zinc-800/60">
               <input id="post-file" type="file" accept="image/*" class="hidden" />
               <img id="post-preview" class="hidden w-full max-h-48 object-cover rounded-lg mb-2" alt="Vista previa" />
               <div id="post-file-placeholder" class="flex flex-col items-center text-gray-400 gap-1">
@@ -276,21 +304,21 @@
           </div>
 
           <div class="flex items-center gap-2 text-[11px] text-gray-400">
-            <div class="h-px bg-gray-200 flex-1"></div>
+            <div class="h-px bg-gray-200 dark:bg-zinc-700 flex-1"></div>
             <span>O pegá un enlace de imagen</span>
-            <div class="h-px bg-gray-200 flex-1"></div>
+            <div class="h-px bg-gray-200 dark:bg-zinc-700 flex-1"></div>
           </div>
 
           <input id="post-url" type="url" placeholder="https://ejemplo.com/foto.jpg"
-                 class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                 class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
 
           <input id="post-location" type="text" placeholder="Ubicación (ej: Arroyo Seco, Santa Fe)"
-                 class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                 class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
 
           <textarea id="post-caption" rows="2" placeholder="Escribí una descripción..."
-                    class="w-full border border-gray-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none"></textarea>
+                    class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none"></textarea>
 
-          <p id="post-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2"></p>
+          <p id="post-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2"></p>
 
           <button id="post-submit-btn" type="submit"
                   class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
@@ -300,25 +328,118 @@
       </div>
     </div>
 
+    <!-- MODAL: Subir Historia (24hs) -->
+    <div id="modal-story-upload" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white dark:bg-zinc-900 w-full sm:rounded-2xl rounded-t-3xl p-5 space-y-3.5 shadow-2xl border-t dark:border-zinc-800">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-gray-900 dark:text-white text-lg">Subir historia</h3>
+            <p class="text-[11px] text-gray-400">Visible durante 24 horas</p>
+          </div>
+          <button id="close-story-upload" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <form id="story-form" class="space-y-3">
+          <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-xl p-4 cursor-pointer hover:border-pink-400 transition bg-gray-50 dark:bg-zinc-800/60">
+            <input id="story-file" type="file" accept="image/*" class="hidden" />
+            <img id="story-preview" class="hidden w-full max-h-60 object-cover rounded-lg mb-2" alt="Vista previa historia" />
+            <div id="story-file-placeholder" class="flex flex-col items-center text-gray-400 gap-1 py-4">
+              <i class="ph ph-camera-plus text-3xl text-pink-500"></i>
+              <span class="text-xs font-medium">Elegí una foto para tu historia</span>
+            </div>
+          </label>
+
+          <input id="story-caption" type="text" maxlength="100" placeholder="Texto breve (opcional)..."
+                 class="w-full border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+
+          <p id="story-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2"></p>
+
+          <button id="story-submit-btn" type="submit"
+                  class="w-full bg-gradient-to-r from-yellow-500 via-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
+            Compartir historia
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- VISOR DE HISTORIAS PANTALLA COMPLETA -->
+    <div id="story-viewer" class="hidden absolute inset-0 bg-black z-50 flex flex-col">
+      <!-- Barras de progreso -->
+      <div id="story-progress-bars" class="flex gap-1 px-2.5 pt-2.5 z-20"></div>
+
+      <!-- Cabecera historia -->
+      <div class="flex items-center justify-between px-3 py-2.5 z-20">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="sv-avatar" class="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-tr from-yellow-400 to-pink-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0"></div>
+          <div class="min-w-0">
+            <p id="sv-author" class="text-white text-sm font-semibold leading-tight truncate"></p>
+            <p id="sv-time" class="text-white/70 text-[11px]"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="sv-delete-btn" class="hidden text-white/80 hover:text-red-400 p-1.5" title="Eliminar historia">
+            <i class="ph ph-trash text-xl"></i>
+          </button>
+          <button id="sv-close-btn" class="text-white/90 hover:text-white p-1.5">
+            <i class="ph ph-x text-2xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Imagen + zonas táctiles izq/der -->
+      <div class="flex-1 relative flex items-center justify-center overflow-hidden">
+        <img id="sv-image" class="w-full h-full object-contain" alt="Historia" />
+        <div id="sv-tap-prev" class="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer"></div>
+        <div id="sv-tap-next" class="absolute inset-y-0 right-0 w-2/3 z-10 cursor-pointer"></div>
+        <div id="sv-caption-wrap" class="hidden absolute bottom-6 inset-x-4 bg-black/55 backdrop-blur-xs text-white text-sm text-center px-4 py-2.5 rounded-2xl z-20">
+          <p id="sv-caption"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Comentarios en tiempo real -->
+    <div id="modal-comments" class="hidden absolute inset-0 bg-black/55 backdrop-blur-xs z-40 flex items-end justify-center">
+      <div class="bg-white dark:bg-zinc-900 w-full h-[78%] rounded-t-3xl flex flex-col shadow-2xl border-t dark:border-zinc-800">
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+          <h3 class="font-bold text-gray-900 dark:text-white text-sm">Comentarios</h3>
+          <button id="close-comments-modal" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1">
+            <i class="ph ph-x text-xl"></i>
+          </button>
+        </div>
+
+        <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-3.5 no-scrollbar"></div>
+
+        <form id="comment-form" class="p-3 border-t border-gray-100 dark:border-zinc-800 flex items-center gap-2 shrink-0 bg-white dark:bg-zinc-900">
+          <input id="comment-input" type="text" maxlength="300" placeholder="Agregá un comentario..."
+                 class="flex-1 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          <button type="submit" id="comment-submit-btn" class="text-pink-600 dark:text-pink-400 font-semibold text-sm px-2 py-1 active:scale-90 transition">
+            Enviar
+          </button>
+        </form>
+      </div>
+    </div>
+
     <!-- MODAL: Confirmar borrado -->
-    <div id="modal-delete" class="hidden absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center space-y-4 shadow-2xl">
-        <div class="w-12 h-12 mx-auto rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+    <div id="modal-delete" class="hidden absolute inset-0 bg-black/55 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 w-full max-w-xs text-center space-y-4 shadow-2xl border dark:border-zinc-800">
+        <div class="w-12 h-12 mx-auto rounded-full bg-red-50 dark:bg-red-950/50 text-red-600 flex items-center justify-center">
           <i class="ph ph-trash text-2xl"></i>
         </div>
         <div>
-          <h4 class="font-bold text-gray-900">¿Eliminar publicación?</h4>
-          <p class="text-xs text-gray-500 mt-1">Esta acción no se puede deshacer.</p>
+          <h4 class="font-bold text-gray-900 dark:text-white">¿Eliminar publicación?</h4>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
         </div>
         <div class="flex gap-2">
-          <button id="btn-cancel-delete" class="flex-1 py-2 rounded-xl bg-gray-100 text-gray-700 text-xs font-semibold">Cancelar</button>
+          <button id="btn-cancel-delete" class="flex-1 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 text-xs font-semibold">Cancelar</button>
           <button id="btn-confirm-delete" class="flex-1 py-2 rounded-xl bg-red-600 text-white text-xs font-semibold">Eliminar</button>
         </div>
       </div>
     </div>
 
     <!-- Toast flotante -->
-    <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 absolute bottom-16 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg z-50 whitespace-nowrap">
+    <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 absolute bottom-16 left-1/2 -translate-x-1/2 bg-gray-900/90 dark:bg-white/95 text-white dark:text-gray-900 text-xs font-medium px-4 py-2 rounded-full shadow-lg z-50 whitespace-nowrap">
       Aviso
     </div>
 
@@ -339,11 +460,13 @@
       getFirestore,
       collection,
       addDoc,
+      setDoc,
       deleteDoc,
       doc,
       updateDoc,
       arrayUnion,
       arrayRemove,
+      increment,
       query,
       orderBy,
       onSnapshot,
@@ -366,11 +489,24 @@
     // Estado global
     let currentUser = null;
     let allPosts = [];
+    let activeStories = [];
+    let usersMap = {}; // { uid: { displayName, photoURL } }
     let currentTab = "home";
-    let authMode = "login"; // 'login' | 'register'
-    let compressedImageDataUrl = "";
+    let authMode = "login";
+    let compressedPostImg = "";
+    let compressedStoryImg = "";
     let pendingDeleteId = null;
     let savedIds = JSON.parse(localStorage.getItem("ec_saved_posts") || "[]");
+
+    // Estado comentarios
+    let activeCommentPostId = null;
+    let unsubscribeComments = null;
+
+    // Estado visor historias
+    let storyGroups = []; // [{ uid, author, items: [...] }]
+    let currentGroupIdx = 0;
+    let currentStoryIdx = 0;
+    let storyTimer = null;
 
     // Referencias DOM
     const feedContainer = document.getElementById("feed-container");
@@ -380,6 +516,7 @@
     const storiesContainer = document.getElementById("stories-container");
     const guestBanner = document.getElementById("guest-banner");
     const authStatusDot = document.getElementById("auth-status-dot");
+    const headerAvatarWrap = document.getElementById("header-avatar-wrap");
 
     const viewFeed = document.getElementById("view-feed");
     const viewProfile = document.getElementById("view-profile");
@@ -389,9 +526,28 @@
 
     const modalAuth = document.getElementById("modal-auth");
     const modalPost = document.getElementById("modal-post");
+    const modalStoryUpload = document.getElementById("modal-story-upload");
+    const modalComments = document.getElementById("modal-comments");
     const modalDelete = document.getElementById("modal-delete");
+    const storyViewer = document.getElementById("story-viewer");
     const toastEl = document.getElementById("toast");
 
+    // --- TEMA CLARO / OSCURO ---
+    const themeIcon = document.getElementById("theme-icon");
+    const metaThemeColor = document.getElementById("meta-theme-color");
+
+    function applyTheme(dark) {
+      document.documentElement.classList.toggle("dark", dark);
+      themeIcon.className = dark ? "ph ph-sun text-xl" : "ph ph-moon text-xl";
+      metaThemeColor.setAttribute("content", dark ? "#18181b" : "#ffffff");
+      localStorage.setItem("ec_theme", dark ? "dark" : "light");
+    }
+    applyTheme(localStorage.getItem("ec_theme") === "dark");
+    document.getElementById("btn-theme-toggle").addEventListener("click", () => {
+      applyTheme(!document.documentElement.classList.contains("dark"));
+    });
+
+    // --- UTILIDADES ---
     let toastTimer = null;
     function showToast(msg) {
       toastEl.textContent = msg;
@@ -401,8 +557,9 @@
     }
 
     function timeAgo(timestamp) {
-      if (!timestamp || !timestamp.toDate) return "Recién";
-      const seconds = Math.floor((Date.now() - timestamp.toDate().getTime()) / 1000);
+      if (!timestamp) return "Recién";
+      const ms = timestamp.toDate ? timestamp.toDate().getTime() : timestamp;
+      const seconds = Math.floor((Date.now() - ms) / 1000);
       if (seconds < 60) return "Hace un momento";
       const mins = Math.floor(seconds / 60);
       if (mins < 60) return `Hace ${mins} min`;
@@ -410,6 +567,54 @@
       if (hrs < 24) return `Hace ${hrs} h`;
       const days = Math.floor(hrs / 24);
       return `Hace ${days} d`;
+    }
+
+    function getUserDisplay(uid, fallbackName) {
+      const u = usersMap[uid];
+      return {
+        name: (u && u.displayName) || fallbackName || "Usuario",
+        photoURL: (u && u.photoURL) || ""
+      };
+    }
+
+    function renderAvatarContent(container, photoURL, name) {
+      container.innerHTML = "";
+      if (photoURL) {
+        const img = document.createElement("img");
+        img.src = photoURL;
+        img.alt = name || "Avatar";
+        img.className = "w-full h-full object-cover";
+        container.appendChild(img);
+      } else {
+        container.textContent = (name || "U")[0].toUpperCase();
+      }
+    }
+
+    function compressImage(file, maxWidth = 900, quality = 0.72) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
     function translateAuthError(code) {
@@ -426,50 +631,16 @@
       return map[code] || "Ocurrió un error al autenticar. Revisá los datos e intentá nuevamente.";
     }
 
-    // Stories de ejemplo + usuarios activos
-    function renderStories() {
-      const defaults = [
-        { name: "Tu historia", isOwn: true },
-        { name: "Comunidad" },
-        { name: "Eventos" },
-        { name: "Noticias" },
-        { name: "Deportes" },
-        { name: "Comercios" }
-      ];
-      storiesContainer.innerHTML = "";
-      defaults.forEach((s) => {
-        const div = document.createElement("button");
-        div.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
-        div.innerHTML = `
-          <div class="w-14 h-14 rounded-full p-[2.5px] ${s.isOwn ? "bg-gray-200" : "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"} relative">
-            <div class="w-full h-full rounded-full bg-white p-[2px] flex items-center justify-center">
-              <div class="w-full h-full rounded-full bg-gradient-to-br from-pink-100 to-purple-100 text-pink-700 font-bold text-sm flex items-center justify-center uppercase">
-                ${s.isOwn ? (currentUser ? (currentUser.displayName || currentUser.email)[0] : "+") : s.name[0]}
-              </div>
-            </div>
-            ${s.isOwn ? '<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-blue-500 text-white border-2 border-white flex items-center justify-center text-xs font-bold">+</span>' : ""}
-          </div>
-          <span class="text-[11px] text-gray-700 truncate w-full text-center">${s.name}</span>
-        `;
-        div.addEventListener("click", () => {
-          if (s.isOwn) {
-            openCreatePost();
-          } else {
-            showToast(`Historias de ${s.name}`);
-          }
-        });
-        storiesContainer.appendChild(div);
-      });
-    }
-
-    // Navegación
+    // --- NAVEGACIÓN ---
     function switchTab(tab) {
       currentTab = tab;
       document.querySelectorAll(".nav-btn").forEach((btn) => {
         const icon = btn.querySelector("i");
         const isActive = btn.dataset.nav === tab;
         btn.classList.toggle("text-gray-900", isActive);
+        btn.classList.toggle("dark:text-white", isActive);
         btn.classList.toggle("text-gray-500", !isActive);
+        btn.classList.toggle("dark:text-gray-400", !isActive);
         if (isActive) {
           icon.classList.remove("ph");
           icon.classList.add("ph-fill");
@@ -484,14 +655,9 @@
       viewFeed.classList.toggle("hidden", tab === "profile");
       storiesSection.classList.toggle("hidden", tab !== "home");
 
-      if (tab === "search") {
-        searchInput.focus();
-      }
-      if (tab === "profile") {
-        renderProfile();
-      } else {
-        renderFeed();
-      }
+      if (tab === "search") searchInput.focus();
+      if (tab === "profile") renderProfile();
+      else renderFeed();
     }
 
     document.querySelectorAll(".nav-btn").forEach((btn) => {
@@ -499,7 +665,7 @@
     });
     document.getElementById("logo-home-btn").addEventListener("click", () => switchTab("home"));
 
-    // Auth modal
+    // --- AUTENTICACIÓN ---
     function setAuthMode(mode) {
       authMode = mode;
       const isReg = mode === "register";
@@ -510,8 +676,8 @@
 
       const tabLogin = document.getElementById("tab-login");
       const tabReg = document.getElementById("tab-register");
-      tabLogin.className = `py-2 rounded-lg transition ${!isReg ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"}`;
-      tabReg.className = `py-2 rounded-lg transition ${isReg ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"}`;
+      tabLogin.className = `py-2 rounded-lg transition ${!isReg ? "bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-xs" : "text-gray-500 dark:text-gray-400"}`;
+      tabReg.className = `py-2 rounded-lg transition ${isReg ? "bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-xs" : "text-gray-500 dark:text-gray-400"}`;
     }
 
     function openAuthModal(mode = "login") {
@@ -544,9 +710,13 @@
       try {
         if (authMode === "register") {
           const cred = await createUserWithEmailAndPassword(auth, email, pass);
-          if (name) {
-            await updateProfile(cred.user, { displayName: name });
-          }
+          const finalName = name || email.split("@")[0];
+          await updateProfile(cred.user, { displayName: finalName });
+          await setDoc(doc(db, "users", cred.user.uid), {
+            displayName: finalName,
+            photoURL: "",
+            updatedAt: serverTimestamp()
+          }, { merge: true });
           showToast("¡Cuenta creada con éxito!");
         } else {
           await signInWithEmailAndPassword(auth, email, pass);
@@ -569,43 +739,345 @@
       switchTab("home");
     });
 
+    function updateHeaderAvatar() {
+      if (!currentUser) {
+        headerAvatarWrap.innerHTML = '<i class="ph ph-user-circle text-2xl"></i>';
+        return;
+      }
+      const info = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+      if (info.photoURL) {
+        headerAvatarWrap.innerHTML = "";
+        const img = document.createElement("img");
+        img.src = info.photoURL;
+        img.className = "w-full h-full object-cover rounded-full border border-pink-400";
+        headerAvatarWrap.appendChild(img);
+      } else {
+        headerAvatarWrap.innerHTML = `<div class="w-7 h-7 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white text-xs font-bold flex items-center justify-center uppercase">${info.name[0]}</div>`;
+      }
+    }
+
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       guestBanner.classList.toggle("hidden", !!user);
       authStatusDot.classList.toggle("hidden", !user);
-      renderStories();
+      updateHeaderAvatar();
+      renderStoriesBar();
       renderFeed();
       if (currentTab === "profile") renderProfile();
     });
 
-    // Compresión de imagen en el navegador para Firestore
-    function compressImage(file, maxWidth = 900, quality = 0.72) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            let w = img.width;
-            let h = img.height;
-            if (w > maxWidth) {
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth;
-            }
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", quality));
-          };
-          img.onerror = reject;
-          img.src = ev.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+    // --- PERFIL Y FOTO EDITABLE ---
+    document.getElementById("avatar-file-input").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file || !currentUser) return;
+      try {
+        showToast("Actualizando foto de perfil...");
+        const avatarDataUrl = await compressImage(file, 260, 0.78);
+        const name = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]).name;
+        await setDoc(doc(db, "users", currentUser.uid), {
+          displayName: name,
+          photoURL: avatarDataUrl,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        showToast("¡Foto de perfil actualizada!");
+      } catch (err) {
+        console.error(err);
+        showToast("Error al guardar foto. Revisá las reglas de Firestore.");
+      }
+    });
+
+    document.getElementById("btn-edit-name").addEventListener("click", async () => {
+      if (!currentUser) return;
+      const currentName = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]).name;
+      const newName = prompt("Ingresá tu nuevo nombre:", currentName);
+      if (!newName || !newName.trim() || newName.trim() === currentName) return;
+      try {
+        await updateProfile(currentUser, { displayName: newName.trim() });
+        await setDoc(doc(db, "users", currentUser.uid), {
+          displayName: newName.trim(),
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        showToast("Nombre actualizado");
+      } catch {
+        showToast("No se pudo actualizar el nombre");
+      }
+    });
+
+    function renderProfile() {
+      const loggedOut = document.getElementById("profile-logged-out");
+      const loggedIn = document.getElementById("profile-logged-in");
+      if (!currentUser) {
+        loggedOut.classList.remove("hidden");
+        loggedIn.classList.add("hidden");
+        return;
+      }
+      loggedOut.classList.add("hidden");
+      loggedIn.classList.remove("hidden");
+
+      const info = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+      renderAvatarContent(document.getElementById("profile-avatar-inner"), info.photoURL, info.name);
+      document.getElementById("profile-name").textContent = info.name;
+      document.getElementById("profile-email").textContent = currentUser.email;
+
+      const myPosts = allPosts.filter((p) => p.uid === currentUser.uid);
+      const totalLikes = myPosts.reduce((acc, p) => acc + (Array.isArray(p.likedBy) ? p.likedBy.length : 0), 0);
+      document.getElementById("stat-posts").textContent = myPosts.length;
+      document.getElementById("stat-likes").textContent = totalLikes;
+
+      const grid = document.getElementById("profile-posts-grid");
+      const noPosts = document.getElementById("profile-no-posts");
+      grid.innerHTML = "";
+      noPosts.classList.toggle("hidden", myPosts.length > 0);
+
+      myPosts.forEach((p) => {
+        const cell = document.createElement("div");
+        cell.className = "aspect-square bg-gray-100 dark:bg-zinc-800 overflow-hidden relative";
+        const img = document.createElement("img");
+        img.src = p.imageUrl;
+        img.className = "w-full h-full object-cover";
+        img.alt = "Mi publicación";
+        cell.appendChild(img);
+        grid.appendChild(cell);
       });
     }
 
+    // --- HISTORIAS REALES (24 HORAS) ---
+    function openUploadStory() {
+      if (!currentUser) {
+        showToast("Iniciá sesión para subir una historia");
+        openAuthModal("login");
+        return;
+      }
+      modalStoryUpload.classList.remove("hidden");
+    }
+
+    document.getElementById("btn-profile-new-story").addEventListener("click", openUploadStory);
+    document.getElementById("close-story-upload").addEventListener("click", () => modalStoryUpload.classList.add("hidden"));
+
+    const storyFileInput = document.getElementById("story-file");
+    const storyPreview = document.getElementById("story-preview");
+    const storyFilePlaceholder = document.getElementById("story-file-placeholder");
+
+    storyFileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        compressedStoryImg = await compressImage(file, 850, 0.72);
+        storyPreview.src = compressedStoryImg;
+        storyPreview.classList.remove("hidden");
+        storyFilePlaceholder.classList.add("hidden");
+      } catch {
+        showToast("No se pudo cargar la imagen");
+      }
+    });
+
+    document.getElementById("story-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return openAuthModal("login");
+      const errEl = document.getElementById("story-error");
+      const btn = document.getElementById("story-submit-btn");
+
+      if (!compressedStoryImg) {
+        errEl.textContent = "Elegí una foto primero.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      errEl.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "Subiendo historia...";
+
+      try {
+        const info = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+        await addDoc(collection(db, "stories"), {
+          uid: currentUser.uid,
+          author: info.name,
+          imageUrl: compressedStoryImg,
+          caption: document.getElementById("story-caption").value.trim(),
+          createdAt: serverTimestamp(),
+          expiresAt: Date.now() + 24 * 60 * 60 * 1000
+        });
+        document.getElementById("story-form").reset();
+        compressedStoryImg = "";
+        storyPreview.classList.add("hidden");
+        storyFilePlaceholder.classList.remove("hidden");
+        modalStoryUpload.classList.add("hidden");
+        showToast("¡Historia publicada por 24 hs!");
+      } catch (err) {
+        console.error(err);
+        errEl.textContent = "Error al subir historia. Revisá las reglas de Firestore.";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Compartir historia";
+      }
+    });
+
+    function buildStoryGroups() {
+      const now = Date.now();
+      const valid = activeStories.filter((s) => !s.expiresAt || s.expiresAt > now);
+      const map = new Map();
+      // Orden cronológico para ver primero la más vieja de cada usuario
+      [...valid].reverse().forEach((s) => {
+        if (!map.has(s.uid)) {
+          map.set(s.uid, { uid: s.uid, author: s.author, items: [] });
+        }
+        map.get(s.uid).items.push(s);
+      });
+      storyGroups = Array.from(map.values());
+    }
+
+    function renderStoriesBar() {
+      buildStoryGroups();
+      storiesContainer.innerHTML = "";
+
+      // Botón "Tu historia" (siempre primero)
+      const myBtn = document.createElement("button");
+      myBtn.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
+      const myInfo = currentUser ? getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]) : { name: "+", photoURL: "" };
+      myBtn.innerHTML = `
+        <div class="w-14 h-14 rounded-full p-[2.5px] bg-gray-200 dark:bg-zinc-700 relative">
+          <div class="w-full h-full rounded-full bg-white dark:bg-zinc-900 p-[2px]">
+            <div class="my-story-avatar w-full h-full rounded-full bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/50 dark:to-purple-900/50 text-pink-600 dark:text-pink-300 font-bold text-sm flex items-center justify-center uppercase overflow-hidden"></div>
+          </div>
+          <span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-blue-500 text-white border-2 border-white dark:border-zinc-900 flex items-center justify-center text-xs font-bold">+</span>
+        </div>
+        <span class="text-[11px] text-gray-700 dark:text-gray-300 truncate w-full text-center">Tu historia</span>
+      `;
+      renderAvatarContent(myBtn.querySelector(".my-story-avatar"), myInfo.photoURL, myInfo.name);
+      myBtn.addEventListener("click", openUploadStory);
+      storiesContainer.appendChild(myBtn);
+
+      // Historias activas de la comunidad
+      storyGroups.forEach((group, gIdx) => {
+        const info = getUserDisplay(group.uid, group.author);
+        const btn = document.createElement("button");
+        btn.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
+        btn.innerHTML = `
+          <div class="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
+            <div class="w-full h-full rounded-full bg-white dark:bg-zinc-900 p-[2px]">
+              <div class="st-avatar w-full h-full rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white font-bold text-sm flex items-center justify-center uppercase overflow-hidden"></div>
+            </div>
+          </div>
+          <span class="text-[11px] text-gray-700 dark:text-gray-300 truncate w-full text-center st-name"></span>
+        `;
+        renderAvatarContent(btn.querySelector(".st-avatar"), info.photoURL, info.name);
+        btn.querySelector(".st-name").textContent = currentUser && group.uid === currentUser.uid ? "Tus historias" : info.name;
+        btn.addEventListener("click", () => openStoryViewer(gIdx, 0));
+        storiesContainer.appendChild(btn);
+      });
+    }
+
+    function openStoryViewer(groupIdx, storyIdx) {
+      if (!storyGroups[groupIdx]) return closeStoryViewer();
+      currentGroupIdx = groupIdx;
+      currentStoryIdx = storyIdx;
+      storyViewer.classList.remove("hidden");
+      showCurrentStory();
+    }
+
+    function closeStoryViewer() {
+      clearTimeout(storyTimer);
+      storyViewer.classList.add("hidden");
+    }
+
+    function showCurrentStory() {
+      clearTimeout(storyTimer);
+      const group = storyGroups[currentGroupIdx];
+      if (!group || !group.items[currentStoryIdx]) return closeStoryViewer();
+
+      const item = group.items[currentStoryIdx];
+      const info = getUserDisplay(item.uid, item.author);
+
+      // Barras de progreso
+      const barsEl = document.getElementById("story-progress-bars");
+      barsEl.innerHTML = "";
+      group.items.forEach((_, idx) => {
+        const bar = document.createElement("div");
+        bar.className = "h-0.5 flex-1 bg-white/30 rounded-full overflow-hidden";
+        const fill = document.createElement("div");
+        fill.className = "h-full bg-white transition-all";
+        if (idx < currentStoryIdx) fill.style.width = "100%";
+        else if (idx === currentStoryIdx) {
+          fill.style.width = "0%";
+          fill.style.transition = "width 5s linear";
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => { fill.style.width = "100%"; });
+          });
+        } else {
+          fill.style.width = "0%";
+        }
+        bar.appendChild(fill);
+        barsEl.appendChild(bar);
+      });
+
+      renderAvatarContent(document.getElementById("sv-avatar"), info.photoURL, info.name);
+      document.getElementById("sv-author").textContent = info.name;
+      document.getElementById("sv-time").textContent = timeAgo(item.createdAt);
+      document.getElementById("sv-image").src = item.imageUrl;
+
+      const capWrap = document.getElementById("sv-caption-wrap");
+      if (item.caption) {
+        document.getElementById("sv-caption").textContent = item.caption;
+        capWrap.classList.remove("hidden");
+      } else {
+        capWrap.classList.add("hidden");
+      }
+
+      const delBtn = document.getElementById("sv-delete-btn");
+      const isOwner = currentUser && currentUser.uid === item.uid;
+      delBtn.classList.toggle("hidden", !isOwner);
+      delBtn.onclick = async () => {
+        clearTimeout(storyTimer);
+        if (!confirm("¿Eliminar esta historia?")) {
+          showCurrentStory();
+          return;
+        }
+        try {
+          await deleteDoc(doc(db, "stories", item.id));
+          showToast("Historia eliminada");
+          closeStoryViewer();
+        } catch {
+          showToast("No se pudo eliminar la historia");
+        }
+      };
+
+      storyTimer = setTimeout(nextStory, 5000);
+    }
+
+    function nextStory() {
+      const group = storyGroups[currentGroupIdx];
+      if (!group) return closeStoryViewer();
+      if (currentStoryIdx + 1 < group.items.length) {
+        currentStoryIdx++;
+        showCurrentStory();
+      } else if (currentGroupIdx + 1 < storyGroups.length) {
+        currentGroupIdx++;
+        currentStoryIdx = 0;
+        showCurrentStory();
+      } else {
+        closeStoryViewer();
+      }
+    }
+
+    function prevStory() {
+      if (currentStoryIdx > 0) {
+        currentStoryIdx--;
+        showCurrentStory();
+      } else if (currentGroupIdx > 0) {
+        currentGroupIdx--;
+        currentStoryIdx = storyGroups[currentGroupIdx].items.length - 1;
+        showCurrentStory();
+      } else {
+        showCurrentStory();
+      }
+    }
+
+    document.getElementById("sv-close-btn").addEventListener("click", closeStoryViewer);
+    document.getElementById("sv-tap-next").addEventListener("click", nextStory);
+    document.getElementById("sv-tap-prev").addEventListener("click", prevStory);
+
+    // --- PUBLICACIONES ---
     function openCreatePost() {
       if (!currentUser) {
         showToast("Iniciá sesión para publicar");
@@ -627,8 +1099,8 @@
       const file = e.target.files[0];
       if (!file) return;
       try {
-        compressedImageDataUrl = await compressImage(file);
-        postPreview.src = compressedImageDataUrl;
+        compressedPostImg = await compressImage(file, 900, 0.72);
+        postPreview.src = compressedPostImg;
         postPreview.classList.remove("hidden");
         postFilePlaceholder.classList.add("hidden");
       } catch {
@@ -643,7 +1115,7 @@
       const urlVal = document.getElementById("post-url").value.trim();
       const locationVal = document.getElementById("post-location").value.trim();
       const captionVal = document.getElementById("post-caption").value.trim();
-      const imageFinal = compressedImageDataUrl || urlVal;
+      const imageFinal = compressedPostImg || urlVal;
       const errEl = document.getElementById("post-error");
       const submitBtn = document.getElementById("post-submit-btn");
 
@@ -658,24 +1130,27 @@
       submitBtn.textContent = "Publicando...";
 
       try {
+        const info = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
         await addDoc(collection(db, "posts"), {
           uid: currentUser.uid,
-          author: currentUser.displayName || currentUser.email.split("@")[0],
+          author: info.name,
           imageUrl: imageFinal,
           location: locationVal,
           caption: captionVal,
           likedBy: [],
+          commentsCount: 0,
           createdAt: serverTimestamp()
         });
 
         document.getElementById("post-form").reset();
-        compressedImageDataUrl = "";
+        compressedPostImg = "";
         postPreview.classList.add("hidden");
         postFilePlaceholder.classList.remove("hidden");
         modalPost.classList.add("hidden");
         showToast("¡Publicado con éxito!");
         switchTab("home");
       } catch (err) {
+        console.error(err);
         errEl.textContent = "Error al publicar. Revisá las reglas de Firestore.";
         errEl.classList.remove("hidden");
       } finally {
@@ -684,7 +1159,7 @@
       }
     });
 
-    // Likes en tiempo real
+    // --- LIKES Y GUARDADOS ---
     async function toggleLike(post) {
       if (!currentUser) {
         showToast("Iniciá sesión para dar Me gusta");
@@ -693,9 +1168,8 @@
       }
       const likedBy = Array.isArray(post.likedBy) ? post.likedBy : [];
       const alreadyLiked = likedBy.includes(currentUser.uid);
-      const ref = doc(db, "posts", post.id);
       try {
-        await updateDoc(ref, {
+        await updateDoc(doc(db, "posts", post.id), {
           likedBy: alreadyLiked ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid)
         });
       } catch {
@@ -715,7 +1189,109 @@
       renderFeed();
     }
 
-    // Borrar publicación propia
+    // --- COMENTARIOS EN TIEMPO REAL ---
+    function openComments(postId) {
+      activeCommentPostId = postId;
+      modalComments.classList.remove("hidden");
+      const listEl = document.getElementById("comments-list");
+      listEl.innerHTML = '<div class="py-8 text-center text-xs text-gray-400">Cargando comentarios...</div>';
+
+      if (unsubscribeComments) unsubscribeComments();
+      const q = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
+      unsubscribeComments = onSnapshot(q, (snap) => {
+        listEl.innerHTML = "";
+        if (snap.empty) {
+          listEl.innerHTML = '<div class="py-10 text-center text-xs text-gray-400">Todavía no hay comentarios. ¡Sé el primero en comentar!</div>';
+          return;
+        }
+        snap.forEach((docSnap) => {
+          const c = { id: docSnap.id, ...docSnap.data() };
+          const info = getUserDisplay(c.uid, c.author);
+          const isOwner = currentUser && currentUser.uid === c.uid;
+
+          const row = document.createElement("div");
+          row.className = "flex items-start gap-2.5";
+          row.innerHTML = `
+            <div class="c-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug break-words">
+                <span class="font-semibold text-gray-900 dark:text-white mr-1.5 c-author"></span>
+                <span class="c-text"></span>
+              </p>
+              <p class="text-[10px] text-gray-400 mt-0.5">${timeAgo(c.createdAt)}</p>
+            </div>
+            ${isOwner ? '<button class="c-del text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-sm"></i></button>' : ""}
+          `;
+          renderAvatarContent(row.querySelector(".c-avatar"), info.photoURL, info.name);
+          row.querySelector(".c-author").textContent = info.name;
+          row.querySelector(".c-text").textContent = c.text || "";
+
+          const delBtn = row.querySelector(".c-del");
+          if (delBtn) {
+            delBtn.addEventListener("click", async () => {
+              try {
+                await deleteDoc(doc(db, "posts", postId, "comments", c.id));
+                await updateDoc(doc(db, "posts", postId), { commentsCount: increment(-1) }).catch(() => {});
+              } catch {
+                showToast("No se pudo eliminar el comentario");
+              }
+            });
+          }
+          listEl.appendChild(row);
+        });
+        listEl.scrollTop = listEl.scrollHeight;
+      }, (err) => {
+        console.error(err);
+        listEl.innerHTML = '<div class="py-8 text-center text-xs text-red-500">Error cargando comentarios. Revisá las reglas de Firestore.</div>';
+      });
+    }
+
+    function closeComments() {
+      modalComments.classList.add("hidden");
+      activeCommentPostId = null;
+      if (unsubscribeComments) {
+        unsubscribeComments();
+        unsubscribeComments = null;
+      }
+    }
+
+    document.getElementById("close-comments-modal").addEventListener("click", closeComments);
+
+    document.getElementById("comment-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) {
+        showToast("Iniciá sesión para comentar");
+        openAuthModal("login");
+        return;
+      }
+      if (!activeCommentPostId) return;
+      const input = document.getElementById("comment-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const btn = document.getElementById("comment-submit-btn");
+      btn.disabled = true;
+      try {
+        const info = getUserDisplay(currentUser.uid, currentUser.displayName || currentUser.email.split("@")[0]);
+        await addDoc(collection(db, "posts", activeCommentPostId, "comments"), {
+          uid: currentUser.uid,
+          author: info.name,
+          text,
+          createdAt: serverTimestamp()
+        });
+        await updateDoc(doc(db, "posts", activeCommentPostId), {
+          commentsCount: increment(1)
+        }).catch(() => {});
+        input.value = "";
+      } catch (err) {
+        console.error(err);
+        showToast("No se pudo enviar el comentario");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // --- BORRAR POST ---
     document.getElementById("btn-cancel-delete").addEventListener("click", () => {
       pendingDeleteId = null;
       modalDelete.classList.add("hidden");
@@ -733,7 +1309,7 @@
       }
     });
 
-    // Búsqueda
+    // --- BÚSQUEDA ---
     searchInput.addEventListener("input", () => {
       clearSearchBtn.classList.toggle("hidden", !searchInput.value);
       renderFeed();
@@ -744,19 +1320,27 @@
       renderFeed();
     });
 
-    // Renderizar Feed
+    // --- RENDERIZAR FEED ---
     function renderFeed() {
       let list = [...allPosts];
 
       if (currentTab === "saved") {
         list = list.filter((p) => savedIds.includes(p.id));
+        document.getElementById("feed-empty-title").textContent = "No tenés publicaciones guardadas";
+        document.getElementById("feed-empty-sub").textContent = "Tocá el ícono de marcador en cualquier foto para guardarla acá.";
       } else if (currentTab === "search" && searchInput.value.trim()) {
         const q = searchInput.value.trim().toLowerCase();
-        list = list.filter((p) =>
-          (p.author || "").toLowerCase().includes(q) ||
-          (p.location || "").toLowerCase().includes(q) ||
-          (p.caption || "").toLowerCase().includes(q)
-        );
+        list = list.filter((p) => {
+          const info = getUserDisplay(p.uid, p.author);
+          return info.name.toLowerCase().includes(q) ||
+            (p.location || "").toLowerCase().includes(q) ||
+            (p.caption || "").toLowerCase().includes(q);
+        });
+        document.getElementById("feed-empty-title").textContent = "Sin resultados";
+        document.getElementById("feed-empty-sub").textContent = "Probá buscando otro nombre, lugar o palabra.";
+      } else {
+        document.getElementById("feed-empty-title").textContent = "Todavía no hay publicaciones";
+        document.getElementById("feed-empty-sub").innerHTML = 'Tocá el botón <span class="font-bold">+</span> abajo para compartir la primera foto.';
       }
 
       feedContainer.innerHTML = "";
@@ -767,25 +1351,25 @@
         const isLiked = currentUser && likedBy.includes(currentUser.uid);
         const isSaved = savedIds.includes(post.id);
         const isOwner = currentUser && currentUser.uid === post.uid;
+        const info = getUserDisplay(post.uid, post.author);
+        const cCount = Math.max(0, post.commentsCount || 0);
 
         const article = document.createElement("article");
-        article.className = "bg-white pb-4";
+        article.className = "bg-white dark:bg-zinc-900 pb-4";
 
         article.innerHTML = `
           <div class="flex items-center justify-between px-3 py-2.5">
             <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                ${(post.author || "U")[0]}
-              </div>
+              <div class="post-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
               <div class="min-w-0">
-                <p class="font-semibold text-sm text-gray-900 leading-tight truncate author-name"></p>
-                <p class="text-[11px] text-gray-500 truncate post-loc"></p>
+                <p class="font-semibold text-sm text-gray-900 dark:text-white leading-tight truncate author-name"></p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate post-loc"></p>
               </div>
             </div>
             ${isOwner ? '<button class="delete-btn text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-lg"></i></button>' : ""}
           </div>
 
-          <div class="relative bg-gray-100 select-none overflow-hidden img-wrap">
+          <div class="relative bg-gray-100 dark:bg-zinc-800 select-none overflow-hidden img-wrap">
             <img class="w-full max-h-[460px] object-cover post-img" alt="Publicación" loading="lazy" />
             <div class="heart-overlay pointer-events-none absolute inset-0 flex items-center justify-center opacity-0">
               <i class="ph-fill ph-heart text-white text-7xl drop-shadow-lg"></i>
@@ -794,35 +1378,41 @@
 
           <div class="px-3 pt-2.5 flex items-center justify-between">
             <div class="flex items-center gap-4">
-              <button class="like-btn active:scale-90 transition ${isLiked ? "text-red-500" : "text-gray-800"}">
+              <button class="like-btn active:scale-90 transition ${isLiked ? "text-red-500" : "text-gray-800 dark:text-gray-200"}">
                 <i class="${isLiked ? "ph-fill" : "ph"} ph-heart text-2xl"></i>
               </button>
-              <button class="share-btn text-gray-800 active:scale-90 transition">
+              <button class="comment-btn text-gray-800 dark:text-gray-200 active:scale-90 transition" title="Comentarios">
+                <i class="ph ph-chat-circle text-2xl"></i>
+              </button>
+              <button class="share-btn text-gray-800 dark:text-gray-200 active:scale-90 transition" title="Compartir">
                 <i class="ph ph-paper-plane-tilt text-2xl"></i>
               </button>
             </div>
-            <button class="save-btn active:scale-90 transition ${isSaved ? "text-gray-900" : "text-gray-700"}">
+            <button class="save-btn active:scale-90 transition ${isSaved ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}">
               <i class="${isSaved ? "ph-fill" : "ph"} ph-bookmark-simple text-2xl"></i>
             </button>
           </div>
 
           <div class="px-3 pt-1.5 space-y-1">
-            <p class="text-xs font-semibold text-gray-900">${likedBy.length} ${likedBy.length === 1 ? "Me gusta" : "Me gusta"}</p>
-            <p class="text-sm text-gray-800 leading-snug">
-              <span class="font-semibold mr-1 author-cap"></span>
+            <p class="text-xs font-semibold text-gray-900 dark:text-white">${likedBy.length} Me gusta</p>
+            <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug">
+              <span class="font-semibold text-gray-900 dark:text-white mr-1 author-cap"></span>
               <span class="post-cap"></span>
             </p>
+            <button class="view-comments-btn text-xs text-gray-500 dark:text-gray-400 hover:underline block">
+              ${cCount > 0 ? `Ver ${cCount === 1 ? "el comentario" : `los ${cCount} comentarios`}` : "Agregar un comentario..."}
+            </button>
             <p class="text-[10px] uppercase tracking-wide text-gray-400">${timeAgo(post.createdAt)}</p>
           </div>
         `;
 
-        // Contenido seguro (anti-XSS)
-        article.querySelector(".author-name").textContent = post.author || "Usuario";
+        renderAvatarContent(article.querySelector(".post-avatar"), info.photoURL, info.name);
+        article.querySelector(".author-name").textContent = info.name;
         const locEl = article.querySelector(".post-loc");
         if (post.location) locEl.textContent = post.location;
         else locEl.classList.add("hidden");
 
-        article.querySelector(".author-cap").textContent = post.author || "Usuario";
+        article.querySelector(".author-cap").textContent = info.name;
         article.querySelector(".post-cap").textContent = post.caption || "";
 
         const imgEl = article.querySelector(".post-img");
@@ -831,14 +1421,15 @@
           imgEl.src = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80";
         };
 
-        // Eventos
         const likeBtn = article.querySelector(".like-btn");
         likeBtn.addEventListener("click", () => {
           likeBtn.classList.add("animate-btn-bounce");
           toggleLike(post);
         });
 
-        // Doble toque en la foto
+        article.querySelector(".comment-btn").addEventListener("click", () => openComments(post.id));
+        article.querySelector(".view-comments-btn").addEventListener("click", () => openComments(post.id));
+
         let lastTap = 0;
         const imgWrap = article.querySelector(".img-wrap");
         const heartOverlay = article.querySelector(".heart-overlay");
@@ -881,59 +1472,35 @@
       });
     }
 
-    // Renderizar Perfil
-    function renderProfile() {
-      const loggedOut = document.getElementById("profile-logged-out");
-      const loggedIn = document.getElementById("profile-logged-in");
-      if (!currentUser) {
-        loggedOut.classList.remove("hidden");
-        loggedIn.classList.add("hidden");
-        return;
-      }
-      loggedOut.classList.add("hidden");
-      loggedIn.classList.remove("hidden");
-
-      const displayName = currentUser.displayName || currentUser.email.split("@")[0];
-      document.getElementById("profile-avatar").textContent = displayName[0];
-      document.getElementById("profile-name").textContent = displayName;
-      document.getElementById("profile-email").textContent = currentUser.email;
-
-      const myPosts = allPosts.filter((p) => p.uid === currentUser.uid);
-      const totalLikes = myPosts.reduce((acc, p) => acc + (Array.isArray(p.likedBy) ? p.likedBy.length : 0), 0);
-      document.getElementById("stat-posts").textContent = myPosts.length;
-      document.getElementById("stat-likes").textContent = totalLikes;
-
-      const grid = document.getElementById("profile-posts-grid");
-      const noPosts = document.getElementById("profile-no-posts");
-      grid.innerHTML = "";
-      noPosts.classList.toggle("hidden", myPosts.length > 0);
-
-      myPosts.forEach((p) => {
-        const cell = document.createElement("div");
-        cell.className = "aspect-square bg-gray-100 overflow-hidden relative group";
-        const img = document.createElement("img");
-        img.src = p.imageUrl;
-        img.className = "w-full h-full object-cover";
-        img.alt = "Mi publicación";
-        cell.appendChild(img);
-        grid.appendChild(cell);
-      });
-    }
-
-    // Escuchar Firestore en tiempo real
-    const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-    onSnapshot(postsQuery, (snapshot) => {
-      feedLoading.classList.add("hidden");
-      allPosts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    // --- LISTENERS EN TIEMPO REAL ---
+    // 1. Perfiles de usuarios (para avatares actualizados en toda la app)
+    onSnapshot(collection(db, "users"), (snap) => {
+      const nextMap = {};
+      snap.forEach((d) => { nextMap[d.id] = d.data(); });
+      usersMap = nextMap;
+      updateHeaderAvatar();
+      renderStoriesBar();
       renderFeed();
       if (currentTab === "profile") renderProfile();
-    }, (error) => {
+    }, (err) => console.error("Error users:", err));
+
+    // 2. Historias activas
+    onSnapshot(query(collection(db, "stories"), orderBy("createdAt", "desc")), (snap) => {
+      activeStories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderStoriesBar();
+    }, (err) => console.error("Error stories:", err));
+
+    // 3. Publicaciones
+    onSnapshot(query(collection(db, "posts"), orderBy("createdAt", "desc")), (snap) => {
+      feedLoading.classList.add("hidden");
+      allPosts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderFeed();
+      if (currentTab === "profile") renderProfile();
+    }, (err) => {
       feedLoading.classList.add("hidden");
       showToast("Error conectando con Firestore");
-      console.error(error);
+      console.error(err);
     });
-
-    renderStories();
   </script>
 
   <!-- PWA Service Worker + Botón Instalar -->
