@@ -21,7 +21,7 @@
 
   <!-- PWA Config -->
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
+  <meta name="theme-color" content="#db2777" id="meta-theme-color" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Comunicados" />
@@ -89,37 +89,42 @@
   <!-- App Container -->
   <div class="w-full max-w-md bg-white dark:bg-zinc-900 h-[100dvh] md:h-[90dvh] md:rounded-3xl md:shadow-2xl md:border md:border-gray-200 dark:md:border-zinc-800 flex flex-col overflow-hidden relative transition-colors">
 
-    <!-- Header -->
-    <header class="px-4 py-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0 z-20">
-      <button id="logo-home-btn" class="font-logo text-[26px] sm:text-[30px] leading-none text-gray-900 dark:text-white tracking-wide select-none">
-        Estemos Comunicados
+    <!-- Header estilo folleto (degradado rosa-violeta + detalle turquesa) -->
+    <header class="px-4 py-3 bg-gradient-to-r from-pink-600 via-fuchsia-600 to-purple-700 shadow-md flex items-center justify-between shrink-0 z-20">
+      <button id="logo-home-btn" class="flex items-center gap-2 select-none group">
+        <span class="w-8 h-8 rounded-xl bg-teal-400 text-white shadow-sm flex items-center justify-center group-active:scale-90 transition">
+          <i class="ph-fill ph-paper-plane-tilt text-lg"></i>
+        </span>
+        <span class="font-logo text-[25px] sm:text-[29px] leading-none text-white tracking-wide drop-shadow-xs">
+          Estemos Comunicados
+        </span>
       </button>
 
       <div class="flex items-center gap-1.5 sm:gap-2">
         <!-- Botón Instalar PWA -->
         <button id="btn-install-pwa"
-                class="hidden items-center gap-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
-          <i class="ph ph-download-simple text-sm"></i>
+                class="hidden items-center gap-1 bg-white text-pink-600 hover:bg-pink-50 text-[11px] font-bold px-2.5 py-1.5 rounded-full shadow-sm active:scale-95 transition">
+          <i class="ph-bold ph-download-simple text-sm"></i>
           <span>Instalar</span>
         </button>
 
         <!-- Botón Notificaciones -->
-        <button id="btn-notifications" class="hidden text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white p-1 active:scale-90 transition relative" title="Notificaciones">
+        <button id="btn-notifications" class="hidden text-white/90 hover:text-white p-1 active:scale-90 transition relative" title="Notificaciones">
           <i class="ph ph-bell text-xl"></i>
-          <span id="notif-badge" class="hidden min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center">0</span>
+          <span id="notif-badge" class="hidden min-w-[16px] h-4 px-1 bg-teal-400 text-zinc-900 text-[10px] font-extrabold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center shadow">0</span>
         </button>
 
         <!-- Botón Modo Oscuro -->
-        <button id="btn-theme-toggle" class="text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white p-1 active:scale-90 transition" title="Cambiar tema">
+        <button id="btn-theme-toggle" class="text-white/90 hover:text-white p-1 active:scale-90 transition" title="Cambiar tema">
           <i id="theme-icon" class="ph ph-moon text-xl"></i>
         </button>
 
         <!-- Acceso Cuenta / Perfil -->
-        <button id="btn-open-auth-header" class="text-gray-800 dark:text-gray-200 hover:text-black dark:hover:text-white active:scale-90 transition relative" title="Cuenta">
-          <div id="header-avatar-wrap" class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+        <button id="btn-open-auth-header" class="text-white/90 hover:text-white active:scale-90 transition relative" title="Cuenta">
+          <div id="header-avatar-wrap" class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white/60">
             <i class="ph ph-user-circle text-2xl"></i>
           </div>
-          <span id="auth-status-dot" class="hidden w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-zinc-900 rounded-full absolute -top-0.5 -right-0.5"></span>
+          <span id="auth-status-dot" class="hidden w-2.5 h-2.5 bg-teal-300 border-2 border-purple-700 rounded-full absolute -top-0.5 -right-0.5"></span>
         </button>
       </div>
     </header>
@@ -152,12 +157,12 @@
         </section>
 
         <!-- Banner invitación -->
-        <div id="guest-banner" class="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/40 dark:to-purple-950/40 border border-pink-100 dark:border-pink-900/50 flex items-center justify-between gap-2">
+        <div id="guest-banner" class="mx-3 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-pink-50 via-purple-50 to-teal-50 dark:from-pink-950/40 dark:via-purple-950/40 dark:to-teal-950/30 border border-pink-200/80 dark:border-pink-900/50 shadow-xs flex items-center justify-between gap-2.5">
           <div class="text-xs text-gray-700 dark:text-gray-300">
-            <p class="font-semibold text-gray-900 dark:text-white">¡Sumate a la comunidad!</p>
-            <p>Entrá con Google o tu correo para publicar y comentar.</p>
+            <p class="font-bold text-pink-700 dark:text-pink-300">¡100% Gratis para la comunidad!</p>
+            <p>Entrá con Google en un clic para publicar y comentar.</p>
           </div>
-          <button id="btn-banner-login" class="shrink-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition">
+          <button id="btn-banner-login" class="shrink-0 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm active:scale-95 transition">
             Ingresar
           </button>
         </div>
@@ -184,7 +189,7 @@
       <!-- Vista Perfil Propio -->
       <div id="view-profile" class="hidden p-4 pb-8">
         <div id="profile-logged-out" class="py-10 text-center space-y-4">
-          <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-0.5">
+          <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 p-0.5">
             <div class="w-full h-full bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center">
               <i class="ph ph-user text-4xl text-gray-400"></i>
             </div>
@@ -193,7 +198,7 @@
             <h2 class="font-bold text-gray-900 dark:text-white text-lg">Tu perfil en Estemos Comunicados</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 px-4">Iniciá sesión en un clic con Google o creá una cuenta para subir fotos, historias y comentar.</p>
           </div>
-          <button id="btn-profile-open-auth" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
+          <button id="btn-profile-open-auth" class="bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
             Iniciar sesión / Registrarse
           </button>
         </div>
@@ -203,7 +208,7 @@
             <!-- Avatar editable -->
             <label class="relative cursor-pointer shrink-0 group" title="Cambiar foto de perfil">
               <input id="avatar-file-input" type="file" accept="image/*" class="hidden" />
-              <div id="profile-avatar-box" class="w-[72px] h-[72px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2.5px]">
+              <div id="profile-avatar-box" class="w-[72px] h-[72px] rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 p-[2.5px]">
                 <div id="profile-avatar-inner" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase overflow-hidden border-2 border-white dark:border-zinc-900">
                   U
                 </div>
@@ -230,7 +235,7 @@
           </div>
 
           <div class="flex gap-2">
-            <button id="btn-profile-new-post" class="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
+            <button id="btn-profile-new-post" class="flex-1 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm active:scale-95 transition">
               + Publicar foto
             </button>
             <button id="btn-profile-new-story" class="flex-1 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition">
@@ -253,20 +258,20 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 px-6 py-2.5 flex items-center justify-between shrink-0 z-20">
-      <button data-nav="home" class="nav-btn text-gray-900 dark:text-white p-1 active:scale-90 transition" title="Inicio">
+    <nav class="bg-white dark:bg-zinc-900 border-t border-pink-100 dark:border-zinc-800 px-6 py-2 flex items-center justify-between shrink-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
+      <button data-nav="home" class="nav-btn text-pink-600 dark:text-pink-400 p-1.5 active:scale-90 transition" title="Inicio">
         <i class="ph-fill ph-house text-2xl"></i>
       </button>
-      <button data-nav="search" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Buscar">
+      <button data-nav="search" class="nav-btn text-gray-400 dark:text-gray-500 hover:text-pink-500 p-1.5 active:scale-90 transition" title="Buscar">
         <i class="ph ph-magnifying-glass text-2xl"></i>
       </button>
-      <button id="btn-nav-create" class="p-1 text-gray-800 dark:text-gray-200 hover:text-pink-600 active:scale-90 transition" title="Nueva publicación">
-        <i class="ph ph-plus-square text-[26px]"></i>
+      <button id="btn-nav-create" class="bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-600 text-white p-2 rounded-2xl shadow-md hover:shadow-lg active:scale-90 transition flex items-center justify-center" title="Nueva publicación">
+        <i class="ph-bold ph-plus text-xl"></i>
       </button>
-      <button data-nav="saved" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Guardados">
+      <button data-nav="saved" class="nav-btn text-gray-400 dark:text-gray-500 hover:text-pink-500 p-1.5 active:scale-90 transition" title="Guardados">
         <i class="ph ph-bookmark-simple text-2xl"></i>
       </button>
-      <button data-nav="profile" class="nav-btn text-gray-500 dark:text-gray-400 p-1 active:scale-90 transition" title="Perfil">
+      <button data-nav="profile" class="nav-btn text-gray-400 dark:text-gray-500 hover:text-pink-500 p-1.5 active:scale-90 transition" title="Perfil">
         <i class="ph ph-user-circle text-2xl"></i>
       </button>
     </nav>
@@ -330,7 +335,7 @@
           <p id="auth-success" class="hidden text-xs text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-900 rounded-lg px-3 py-2"></p>
 
           <button id="auth-submit-btn" type="submit"
-                  class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
+                  class="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
             Entrar
           </button>
         </form>
@@ -389,7 +394,7 @@
           <p id="post-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/50 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2"></p>
 
           <button id="post-submit-btn" type="submit"
-                  class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
+                  class="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow-sm active:scale-95 transition">
             Publicar ahora
           </button>
         </form>
@@ -497,7 +502,7 @@
 
         <div class="flex-1 overflow-y-auto p-4 space-y-5 no-scrollbar">
           <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2px] shrink-0">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 p-[2px] shrink-0">
               <div id="pp-avatar" class="w-full h-full rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 text-white flex items-center justify-center text-2xl font-bold uppercase overflow-hidden border-2 border-white dark:border-zinc-900"></div>
             </div>
             <div class="min-w-0 flex-1">
@@ -558,7 +563,7 @@
           </button>
 
           <button id="btn-share-native"
-                  class="hidden w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-sm active:scale-95 transition">
+                  class="hidden w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-sm active:scale-95 transition">
             <i class="ph ph-share-network text-xl"></i>
             <span>Más opciones</span>
           </button>
@@ -637,7 +642,7 @@
     const googleProvider = new GoogleAuthProvider();
 
     // Administradores con permiso de moderación
-    const ADMIN_EMAILS = ["desarrolladorweb26@gmail.com"];
+    const ADMIN_EMAILS = ["desarrollador.web26@gmail.com"];
     const CATEGORIES = ["Todo", "Comunidad", "Noticias", "Eventos", "Comercios", "Deportes"];
 
     // Estado global
@@ -713,7 +718,7 @@
     function applyTheme(dark) {
       document.documentElement.classList.toggle("dark", dark);
       themeIcon.className = dark ? "ph ph-sun text-xl" : "ph ph-moon text-xl";
-      metaThemeColor.setAttribute("content", dark ? "#18181b" : "#ffffff");
+      metaThemeColor.setAttribute("content", dark ? "#18181b" : "#db2777");
       localStorage.setItem("ec_theme", dark ? "dark" : "light");
     }
     applyTheme(localStorage.getItem("ec_theme") === "dark");
@@ -912,16 +917,48 @@
       }
     });
 
-    // --- CATEGORÍAS RÁPIDAS ---
+    // --- CATEGORÍAS RÁPIDAS (Paleta del folleto) ---
+    const CATEGORY_STYLES = {
+      Todo: {
+        active: "bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white border-transparent shadow-sm",
+        inactive: "bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-zinc-700",
+        badge: "bg-pink-50 text-pink-600 border border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-900/50"
+      },
+      Comunidad: {
+        active: "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-transparent shadow-sm",
+        inactive: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-900/50",
+        badge: "bg-pink-50 text-pink-600 border border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-900/50"
+      },
+      Noticias: {
+        active: "bg-gradient-to-r from-sky-500 to-blue-600 text-white border-transparent shadow-sm",
+        inactive: "bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-900/50",
+        badge: "bg-sky-50 text-sky-600 border border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-900/50"
+      },
+      Eventos: {
+        active: "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-transparent shadow-sm",
+        inactive: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50",
+        badge: "bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50"
+      },
+      Comercios: {
+        active: "bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-transparent shadow-sm",
+        inactive: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/50",
+        badge: "bg-purple-50 text-purple-600 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900/50"
+      },
+      Deportes: {
+        active: "bg-gradient-to-r from-teal-500 to-emerald-500 text-white border-transparent shadow-sm",
+        inactive: "bg-teal-50 text-teal-600 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-900/50",
+        badge: "bg-teal-50 text-teal-600 border border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-900/50"
+      }
+    };
+
     function renderCategoriesBar() {
       categoriesContainer.innerHTML = "";
       CATEGORIES.forEach((cat) => {
         const active = selectedCategory === cat;
+        const style = CATEGORY_STYLES[cat] || CATEGORY_STYLES.Todo;
         const btn = document.createElement("button");
-        btn.className = `px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition active:scale-95 ${
-          active
-            ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xs"
-            : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700"
+        btn.className = `px-3.5 py-1.5 rounded-full text-xs font-bold border shrink-0 transition active:scale-95 ${
+          active ? style.active : style.inactive
         }`;
         btn.textContent = cat;
         btn.addEventListener("click", () => {
@@ -940,10 +977,10 @@
       document.querySelectorAll(".nav-btn").forEach((btn) => {
         const icon = btn.querySelector("i");
         const isActive = btn.dataset.nav === tab;
-        btn.classList.toggle("text-gray-900", isActive);
-        btn.classList.toggle("dark:text-white", isActive);
-        btn.classList.toggle("text-gray-500", !isActive);
-        btn.classList.toggle("dark:text-gray-400", !isActive);
+        btn.classList.toggle("text-pink-600", isActive);
+        btn.classList.toggle("dark:text-pink-400", isActive);
+        btn.classList.toggle("text-gray-400", !isActive);
+        btn.classList.toggle("dark:text-gray-500", !isActive);
         if (isActive) {
           icon.classList.remove("ph");
           icon.classList.add("ph-fill");
@@ -1186,7 +1223,7 @@
         const btn = document.createElement("button");
         btn.className = `w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/60 transition ${!n.read ? "bg-pink-50/50 dark:bg-pink-950/20" : ""}`;
         btn.innerHTML = `
-          <div class="n-avatar w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
+          <div class="n-avatar w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
           <div class="flex-1 min-w-0">
             <p class="text-xs text-gray-800 dark:text-gray-200 leading-snug">
               <span class="font-semibold text-gray-900 dark:text-white n-from"></span>
@@ -1464,7 +1501,7 @@
         const btn = document.createElement("button");
         btn.className = "flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition";
         btn.innerHTML = `
-          <div class="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
+          <div class="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400">
             <div class="w-full h-full rounded-full bg-white dark:bg-zinc-900 p-[2px]">
               <div class="st-avatar w-full h-full rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white font-bold text-sm flex items-center justify-center uppercase overflow-hidden"></div>
             </div>
@@ -1733,7 +1770,7 @@
           const row = document.createElement("div");
           row.className = "flex items-start gap-2.5";
           row.innerHTML = `
-            <button class="c-profile-btn c-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></button>
+            <button class="c-profile-btn c-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></button>
             <div class="flex-1 min-w-0">
               <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug break-words">
                 <button class="c-profile-btn font-semibold text-gray-900 dark:text-white mr-1.5 hover:underline c-author"></button>
@@ -1902,14 +1939,14 @@
         article.innerHTML = `
           <div class="flex items-center justify-between px-3 py-2.5 gap-2">
             <button class="open-profile-btn flex items-center gap-2.5 min-w-0 text-left">
-              <div class="post-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
+              <div class="post-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-teal-400 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 overflow-hidden"></div>
               <div class="min-w-0">
                 <p class="font-semibold text-sm text-gray-900 dark:text-white leading-tight truncate author-name hover:underline"></p>
                 <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate post-loc"></p>
               </div>
             </button>
             <div class="flex items-center gap-1.5 shrink-0">
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 post-cat"></span>
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full post-cat"></span>
               ${canDelete ? '<button class="delete-btn text-gray-400 hover:text-red-500 p-1" title="Eliminar"><i class="ph ph-trash text-lg"></i></button>' : ""}
             </div>
           </div>
@@ -1953,7 +1990,10 @@
 
         renderAvatarContent(article.querySelector(".post-avatar"), info.photoURL, info.name);
         article.querySelector(".author-name").textContent = info.name;
-        article.querySelector(".post-cat").textContent = catLabel;
+        const catEl = article.querySelector(".post-cat");
+        catEl.textContent = catLabel;
+        const catStyle = (CATEGORY_STYLES[catLabel] || CATEGORY_STYLES.Comunidad).badge;
+        catEl.className = `text-[10px] font-bold px-2.5 py-0.5 rounded-full post-cat ${catStyle}`;
 
         const locEl = article.querySelector(".post-loc");
         if (post.location) locEl.textContent = post.location;
