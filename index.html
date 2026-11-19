@@ -151,9 +151,9 @@
           <div class="flex gap-3.5 overflow-x-auto no-scrollbar" id="stories-container"></div>
         </section>
 
-        <!-- Categorías rápidas -->
-        <section id="categories-section" class="border-b border-gray-100 dark:border-zinc-800 py-2.5 px-3">
-          <div class="flex gap-2 overflow-x-auto no-scrollbar" id="categories-container"></div>
+        <!-- Categorías rápidas (grilla 3x2 compacta para ver todas sin cortes) -->
+        <section id="categories-section" class="border-b border-gray-100 dark:border-zinc-800 py-2 px-3">
+          <div class="grid grid-cols-3 gap-1.5" id="categories-container"></div>
         </section>
 
         <!-- Banner invitación -->
@@ -957,7 +957,7 @@
         const active = selectedCategory === cat;
         const style = CATEGORY_STYLES[cat] || CATEGORY_STYLES.Todo;
         const btn = document.createElement("button");
-        btn.className = `px-3.5 py-1.5 rounded-full text-xs font-bold border shrink-0 transition active:scale-95 ${
+        btn.className = `w-full py-1 px-2 rounded-full text-[11px] font-bold border text-center truncate transition active:scale-95 ${
           active ? style.active : style.inactive
         }`;
         btn.textContent = cat;
